@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 0; // 0 = menu, 1 = game select, >2 = games
+let page = 0; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 
 // Declare sound variables
 let buttonClickSound;
@@ -21,6 +21,7 @@ function setup() {
   createCanvas(1280, 720);
   colorMode(HSB, 360, 100, 100, 100);
   textAlign(CENTER, CENTER);
+  angleMode(DEGREES);
 }
 
 
@@ -28,19 +29,24 @@ let clicked = false;
 
 
 function pageChanger() { // handles the transitions between pages (fade to black, then fade in again)
-  this.alpha = 100;
-  this.decreasing = false;
+  this.alpha = 0;
+  this.decreasing = true;
   this.targetPage = 0;
+  this.transitionPercent = 0; // value between 0-1, 0=start of transition, 1=peak of transition (black)
+  this.transitionPercentExponential = 0;
 
   this.update = function() { // update alpha values
+    this.transitionPercent = map(constrain(this.alpha, 0, 100), 0, 100, 1, 0);
+    this.transitionPercentExponential = Math.pow(this.transitionPercent, 2);
+    print(this.transitionPercent);
     if (this.decreasing) {
-      this.alpha -= 6;
+      this.alpha -= 4;
       if (this.alpha < 0) {
         this.decreasing = false;
         page = this.targetPage;
       }
     } else {
-      this.alpha += 7;
+      this.alpha += 6;
     }
   }
 
@@ -67,7 +73,7 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.y = y;
   this.width = width;
   this.height = height;
-  this.border = thickness; // border thickness. If zero, fill it in solid
+  this.border = thickness; 
   this.roundness = roundness;
   this.solid = solid;
   this.sound;
@@ -78,7 +84,6 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.mouseInTime = 0;
 
   this.update = function() {
-    this.heldDown = false;
     this.clicked = false;
     if (mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
       if (this.mouseInTime == 0) {
@@ -91,11 +96,17 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
       cursor(HAND);
       this.expansion += (1.1-this.expansion)/6; // grow to 1.1x size
       if (mouseIsPressed) {
+        if (!this.heldDown) { // the user JUST clicked the button down
+          buttonClickSound.rate(0.8);
+          buttonClickSound.play();
+        }
         this.heldDown = true;
         this.expansion = 1.05;
-      }
+      }else{ this.heldDown = false; }
       if (clicked) {
         this.clicked = true;
+        buttonClickSound.stop();
+        buttonClickSound.rate(1);
         buttonClickSound.play();
       }
     } else {
@@ -114,6 +125,7 @@ button.prototype.drawBorder = function(){ // all buttons inherit this border
   this.update();
   translate(this.x + this.width/2, this.y + this.height/2);
   scale(this.expansion);
+  rotate((this.expansion-1)*7)
   glow(color(207, 7, 99), 35);
   strokeWeight(this.border);
   stroke(255, 7, 99);
@@ -131,14 +143,14 @@ button.prototype.drawBorder = function(){ // all buttons inherit this border
 // Each button will have its custom function, because they all look different
 
 // START button
-button.prototype.drawMenuStart = function() { 
+button.prototype.buttonWithText = function(txt, txtSize) { 
   this.drawBorder();
-  textSize(60);
+  textSize(txtSize);
   textFont('Consolas');
   fill(360, 0, 100);
   noStroke();
 
-  text("start", 0, 0);
+  text(txt, 0, 0);
   resetMatrix();
 }
 
@@ -164,19 +176,24 @@ button.prototype.drawBack = function() {
   resetMatrix();
 }
 
-let startButton = new button(500, 350, 280, 100, 10, 10);
+let startButton = new button(500, 350, 280, 100, 8, 10);
+let scoresButton = new button(500, 520, 280, 100, 8, 10);
+let backButton = new button(30, 720-30-60, 150, 60, 10, 10);
 function drawMenu() {
-  startButton.drawMenuStart();
-  drawImage(title, width/2, 140);
+  startButton.buttonWithText("start", 60);
+  scoresButton.buttonWithText("view scores", 40);
+  drawImage(title, width/2, 140 - myPageChanger.transitionPercentExponential*5, 1+myPageChanger.transitionPercentExponential/50);
   if (startButton.clicked) {
-    myPageChanger.change(1);
+    myPageChanger.change(1); // go to game select screen
+  }
+  else if (scoresButton.clicked) {
+    myPageChanger.change(2); // view high scores
   }
 }
 
 let game1Button = new button(640-530, 230, 150*2, 150*2, 10, 10);
 let game2Button = new button(640-150, 280, 150*2, 150*2, 10, 10);
 let game3Button = new button(640+230, 330, 150*2, 150*2, 10, 10);
-let backButton = new button(30, 720-30-60, 150, 60, 10, 10);
 function drawSelect() {
   game1Button.drawGame2();
   game2Button.drawGame2();
@@ -187,18 +204,27 @@ function drawSelect() {
     myPageChanger.change(0);
   }
 
-  glow(color(0, 30, 100), 32)
+  glow(color(20, 40, 100), 32)
 
-  textSize(120);
-  text("game", 640, 100);
-  textSize(70);
-  text("select", 640, 190);
+  textSize(120 + myPageChanger.transitionPercentExponential*8);
+  text("game", 640, 100 - myPageChanger.transitionPercentExponential*8);
+  textSize(70 + myPageChanger.transitionPercentExponential*5);
+  text("select", 640, 190 - myPageChanger.transitionPercentExponential*5);
 }
 
+function drawScores() {
+  backButton.drawBack();
+  if(backButton.clicked) {
+    myPageChanger.change(0);
+  }
+}
 
 function draw() {
-  background(222, 82.6, 27.1);
   cursor(ARROW);
+
+  background(222, 82.6, 27.1);
+  fill(222, 80, 24);
+  triangle(0, 1000 + myPageChanger.transitionPercentExponential * 50, 1280, 720, 1280, 20 - myPageChanger.transitionPercentExponential*50); // small triangle to spice up background
 
   switch (page) {
     case 0:
@@ -206,10 +232,13 @@ function draw() {
       break;
     case 1:
       drawSelect();
+      break;
+    case 2:
+      drawScores();
   }
 
   resetMatrix();
-  myPageChanger.update();
+  myPageChanger.update(); // handles page transitions
   myPageChanger.draw();
   clicked = false;
 }
@@ -226,12 +255,16 @@ function noGlow() {
 }
 
 function drawImage(img, x, y, percentSizeX, percentSizeY) { // same as image(), but center the image at x, y, and size is from 0-1
-  if (arguments.length == 3) {
-    image(img, x - img.width/2, y - img.height/2);
+  translate(x, y);
+  if (arguments.length == 4) {
+    scale(percentSizeX);
   }
-  else {
-    image(img, x - img.width/2, y - img.height/2, img.width/percentSizeX, img.height/percentSizeY);
+  else if (arguments.length == 5) {
+    scale(percentSizeX, percentSizeY);
   }
+  image(img, -img.width/2, -img.height/2);
+
+  resetMatrix();
 }
 
 function mouseClicked() {
