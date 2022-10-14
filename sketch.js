@@ -4,12 +4,16 @@ let page = 0; // 0 = menu, 1 = game select, >2 = games
 
 // Declare sound variables
 let buttonClickSound;
+let buttonHoverSound;
 
 // Declare image files
 let title;
 
 // Preload sound and image files
 function preload() {
+  buttonClickSound = loadSound("assets/menuclick.ogg")
+  buttonHoverSound = loadSound("assets/button hover.ogg");
+
   title = loadImage('assets/placeholder.png');
 }
 
@@ -71,11 +75,17 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.heldDown = false;
   this.clicked = false;
   this.expansion = 1;
+  this.mouseInTime = 0;
 
   this.update = function() {
     this.heldDown = false;
     this.clicked = false;
     if (mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
+      if (this.mouseInTime == 0) {
+        buttonHoverSound.setVolume(0.15);
+        buttonHoverSound.play();
+      }
+      this.mouseInTime ++;
       cursor(HAND);
       this.expansion += (1.1-this.expansion)/6; // grow to 1.1x size
       if (mouseIsPressed) {
@@ -84,9 +94,11 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
       }
       if (clicked) {
         this.clicked = true;
+        buttonClickSound.play();
       }
     } else {
       this.expansion += (1-this.expansion)/6; // quickly shrink to 1x size
+      this.mouseInTime = 0;
     }
   }
 }
