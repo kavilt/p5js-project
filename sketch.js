@@ -1,25 +1,61 @@
 
 // Declare Variables
-var page = 0; // 0 = menu, 1 = game select, >2 = games
+let page = 0; // 0 = menu, 1 = game select, >2 = games
 
 // Declare sound variables
-var buttonClickSound;
+let buttonClickSound;
 
-// Preload sound files
-function Preload() {
-  
+// Declare image files
+let title;
+
+// Preload sound and image files
+function preload() {
+  title = loadImage('assets/placeholder.png');
 }
 
 function setup() {
   createCanvas(1280, 720);
   colorMode(HSB, 360, 100, 100, 100);
+  textAlign(CENTER, CENTER);
 }
 
 
-var clicked = false;
-function mouseClicked() {
-  clicked = true; // true only for one frame when the user releases the mouse
+let clicked = false;
+
+
+function pageChanger() { // handles the transitions between pages (fade to black, then fade in again)
+  this.alpha = 100;
+  this.decreasing = false;
+  this.targetPage = 0;
+
+  this.update = function() { // update alpha values
+    if (this.decreasing) {
+      this.alpha -= 6;
+      if (this.alpha < 0) {
+        this.decreasing = false;
+        page = this.targetPage;
+      }
+    } else {
+      this.alpha += 7;
+    }
+  }
+
+  this.draw = function() { // draw transition overlay over screen
+    noStroke();
+    noGlow();
+    fill(0, 0, 0, 100-this.alpha);
+    rect(0, 0, width, height);
+  }
+
+  this.change = function(targetPage) { // cue a transition
+    this.alpha = 100;
+    this.decreasing = true;
+    this.targetPage = targetPage;
+  }
 }
+var myPageChanger = new pageChanger();
+
+
 
 // buttons can have images inside them
 function button(x, y, width, height, thickness, roundness=0, solid=false) {
@@ -35,29 +71,30 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.heldDown = false;
   this.clicked = false;
   this.expansion = 1;
-}
-button.prototype.update = function() { // Handles: growth on mouseover, click events
-  this.heldDown = false;
-  this.clicked = false;
-  if (mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
-    cursor(HAND);
-    this.expansion += (1.1-this.expansion)/6; // grow to 1.1x size
-    if (mouseIsPressed) {
-      this.heldDown = true;
-      this.expansion = 1.05;
+
+  this.update = function() {
+    this.heldDown = false;
+    this.clicked = false;
+    if (mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
+      cursor(HAND);
+      this.expansion += (1.1-this.expansion)/6; // grow to 1.1x size
+      if (mouseIsPressed) {
+        this.heldDown = true;
+        this.expansion = 1.05;
+      }
+      if (clicked) {
+        this.clicked = true;
+      }
+    } else {
+      this.expansion += (1-this.expansion)/6; // quickly shrink to 1x size
     }
-    if (clicked) {
-      this.clicked = true;
-    }
-  } else {
-    this.expansion += (1-this.expansion)/6; // quickly shrink to 1x size
   }
 }
 button.prototype.drawBorder = function(){ // all buttons inherit this border
   this.update();
   translate(this.x + this.width/2, this.y + this.height/2);
   scale(this.expansion);
-  glow(color(207, 7, 99), 32);
+  glow(color(207, 7, 99), 35);
   strokeWeight(this.border);
   stroke(255, 7, 99);
   if(this.solid) {
@@ -68,59 +105,74 @@ button.prototype.drawBorder = function(){ // all buttons inherit this border
   
   rect(-this.width/2, -this.height/2, this.width, this.height, this.roundness);
 }
-button.prototype.drawGame1 = function() {
+
+
+
+// Each button will have its custom function, because they all look different
+
+// START button
+button.prototype.drawMenuStart = function() { 
   this.drawBorder();
-}
-
-function pageChanger() { // handles the transitions between pages (fade to black, then fade in again)
-  this.alpha = 255;
-  this.decreasing = false;
-  this.targetPage = 0;
-
-  this.update = function() { // update alpha values
-    if (this.decreasing) {
-      this.changed = false;
-      this.alpha -= 10;
-      if (this.alpha < 0) {
-        this.decreasing = false;
-        page = this.targetPage;
-        this.changed = true; // is true the moment the screen is pitch black
-      }
-    } else {
-      this.alpha += 20;
-    }
-  }
-}
-pageChanger.prototype.draw = function() { // draw the actual transition
+  textSize(60);
+  textFont('Consolas');
+  fill(360, 0, 100);
   noStroke();
-  fill(0, 0, 0, 255-this.alpha);
-  rect(0, 0, width, height);
-}
-pageChanger.prototype.change = function(targetPage) { // call this when the transition starts
-  this.alpha = 255;
-  this.decreasing = true;
-  this.targetPage = targetPage;
-}
-var myPageChanger = new pageChanger();
 
-/** Main Menu Elements
- * 3D Title Text
- * Torches
- * Dungeon Background
- * Main "start" button
- * */ 
+  text("start", 0, 0);
+  resetMatrix();
+}
 
-let startButton = new button(800, 100, 200, 200, 10, 10);
+// game select screen buttons
+button.prototype.drawGame2 = function() {
+  this.drawBorder();
+  circle(0, 0, 40, 40);
+
+  resetMatrix();
+}
+
+// back button
+button.prototype.drawBack = function() {
+  this.update();
+  translate(this.x + this.width/2, this.y + this.height/2);
+  scale(this.expansion);
+  glow(color(207, 7, 99), 35);
+  fill(0, 0, 100);
+  noStroke();
+  textSize(40);
+  text("back", 0, 0);
+
+  resetMatrix();
+}
+
+let startButton = new button(500, 350, 280, 100, 10, 10);
 function drawMenu() {
-  startButton.drawGame1();
+  startButton.drawMenuStart();
+  drawImage(title, width/2, 140);
   if (startButton.clicked) {
     myPageChanger.change(1);
   }
 }
 
-
+let game1Button = new button(640-530, 230, 150*2, 150*2, 10, 10);
+let game2Button = new button(640-150, 280, 150*2, 150*2, 10, 10);
+let game3Button = new button(640+230, 330, 150*2, 150*2, 10, 10);
+let backButton = new button(30, 720-30-60, 150, 60, 10, 10);
 function drawSelect() {
+  game1Button.drawGame2();
+  game2Button.drawGame2();
+  game3Button.drawGame2();
 
+  backButton.drawBack();
+  if (backButton.clicked) {
+    myPageChanger.change(0);
+  }
+
+  glow(color(0, 30, 100), 32)
+
+  textSize(120);
+  text("game", 640, 100);
+  textSize(70);
+  text("select", 640, 190);
 }
 
 
@@ -139,11 +191,29 @@ function draw() {
   resetMatrix();
   myPageChanger.update();
   myPageChanger.draw();
-
   clicked = false;
 }
+
+
 
 function glow(color, blurriness) {
   drawingContext.shadowBlur = blurriness;
   drawingContext.shadowColor = color;
+}
+function noGlow() {
+  drawingContext.shadowBlur = 0;
+  drawingContext.shadowColor = null;
+}
+
+function drawImage(img, x, y, percentSizeX, percentSizeY) { // same as image(), but center the image at x, y, and size is from 0-1
+  if (arguments.length == 3) {
+    image(img, x - img.width/2, y - img.height/2);
+  }
+  else {
+    image(img, x - img.width/2, y - img.height/2, img.width/percentSizeX, img.height/percentSizeY);
+  }
+}
+
+function mouseClicked() {
+  clicked = true; // true only for one frame when the user releases the mouse
 }
