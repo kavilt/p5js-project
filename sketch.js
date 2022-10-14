@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 0; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 1; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 
 // Declare sound variables
 let buttonClickSound;
@@ -31,19 +31,18 @@ let clicked = false;
 function pageChanger() { // handles the transitions between pages (fade to black, then fade in again)
   this.alpha = 0;
   this.decreasing = true;
-  this.targetPage = 0;
+  this.targetPage = null;
   this.transitionPercent = 0; // value between 0-1, 0=start of transition, 1=peak of transition (black)
   this.transitionPercentExponential = 0;
 
   this.update = function() { // update alpha values
     this.transitionPercent = map(constrain(this.alpha, 0, 100), 0, 100, 1, 0);
     this.transitionPercentExponential = Math.pow(this.transitionPercent, 2);
-    print(this.transitionPercent);
     if (this.decreasing) {
       this.alpha -= 4;
       if (this.alpha < 0) {
         this.decreasing = false;
-        page = this.targetPage;
+        if (this.targetPage != null) {page = this.targetPage; print("hi");}
       }
     } else {
       this.alpha += 6;
@@ -159,6 +158,10 @@ button.prototype.drawGame2 = function() {
   this.drawBorder();
   circle(0, 0, 40, 40);
 
+  noStroke();
+  fill(0, 0, 100);
+  textSize(50);
+  text("game 1", 0, 190);
   resetMatrix();
 }
 
@@ -205,11 +208,10 @@ function drawSelect() {
   }
 
   glow(color(20, 40, 100), 32)
-
-  textSize(120 + myPageChanger.transitionPercentExponential*8);
-  text("game", 640, 100 - myPageChanger.transitionPercentExponential*8);
-  textSize(70 + myPageChanger.transitionPercentExponential*5);
-  text("select", 640, 190 - myPageChanger.transitionPercentExponential*5);
+  textSize(120 - myPageChanger.transitionPercentExponential*3);
+  text("game", 640, 100 + myPageChanger.transitionPercentExponential*3);
+  textSize(70 - myPageChanger.transitionPercentExponential*2);
+  text("select", 640, 190 + myPageChanger.transitionPercentExponential*5);
 }
 
 function drawScores() {
