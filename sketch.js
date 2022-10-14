@@ -159,9 +159,21 @@ button.prototype.drawGame2 = function() {
   circle(0, 0, 40, 40);
 
   noStroke();
+  glow(color(200, 100, 100), 32);
+  fill(222, 82.6, 27.1); // slightly lighter blue
+  rect(-this.width/2 + 20, 110, 150, 60, 10);
+
+  glow(color(0, 0, 100), 32);
+  noFill();
+  stroke(0, 0, 100);
+  strokeWeight(5);
+  rect(-this.width/2 + 20, 110, 150, 60, 10);
+
+  noStroke();
   fill(0, 0, 100);
-  textSize(50);
-  text("game 1", 0, 190);
+  textSize(30);
+  text("game 1",-55, 140);
+
   resetMatrix();
 }
 
@@ -179,6 +191,10 @@ button.prototype.drawBack = function() {
   resetMatrix();
 }
 
+
+
+// main menu (page = 0)
+
 let startButton = new button(500, 350, 280, 100, 8, 10);
 let scoresButton = new button(500, 520, 280, 100, 8, 10);
 let backButton = new button(30, 720-30-60, 150, 60, 10, 10);
@@ -194,10 +210,19 @@ function drawMenu() {
   }
 }
 
+
+// selection screen (page = 1)
+
 let game1Button = new button(640-530, 230, 150*2, 150*2, 10, 10);
 let game2Button = new button(640-150, 280, 150*2, 150*2, 10, 10);
 let game3Button = new button(640+230, 330, 150*2, 150*2, 10, 10);
 function drawSelect() {
+  // circles
+  fill(222, 82, 33, 50);
+  circle(1170, 50, 310);
+  fill(222, 82, 31);
+  circle(1270, 170, 160);
+
   game1Button.drawGame2();
   game2Button.drawGame2();
   game3Button.drawGame2();
@@ -206,13 +231,26 @@ function drawSelect() {
   if (backButton.clicked) {
     myPageChanger.change(0);
   }
+  else if (game1Button.clicked) {
+    myPageChanger.change(3);
+  }
+  else if (game2Button.clicked) {
+    myPageChanger.change(4);
+  }
+  else if (game3Button.clicked) {
+    myPageChanger.change(5);
+  }
 
-  glow(color(20, 40, 100), 32)
+  glow(color(40, 40, 100), 32)
   textSize(120 - myPageChanger.transitionPercentExponential*3);
   text("game", 640, 100 + myPageChanger.transitionPercentExponential*3);
   textSize(70 - myPageChanger.transitionPercentExponential*2);
   text("select", 640, 190 + myPageChanger.transitionPercentExponential*5);
 }
+
+
+
+// scores (page = 2)
 
 function drawScores() {
   backButton.drawBack();
@@ -221,12 +259,23 @@ function drawScores() {
   }
 }
 
-function draw() {
-  cursor(ARROW);
 
+
+
+
+
+// background
+
+function drawBackground() {
   background(222, 82.6, 27.1);
   fill(222, 80, 24);
   triangle(0, 1000 + myPageChanger.transitionPercentExponential * 50, 1280, 720, 1280, 20 - myPageChanger.transitionPercentExponential*50); // small triangle to spice up background
+}
+
+function draw() {
+  cursor(ARROW);
+
+  drawBackground();
 
   switch (page) {
     case 0:
@@ -237,6 +286,16 @@ function draw() {
       break;
     case 2:
       drawScores();
+      break;
+    case 3:
+      drawGame1();
+      break;
+    case 4:
+      drawGame2();
+      break;
+    case 5:
+      drawGame3();
+      break;
   }
 
   resetMatrix();
