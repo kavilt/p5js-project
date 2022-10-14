@@ -57,8 +57,7 @@ button.prototype.drawBorder = function(){ // all buttons inherit this border
   this.update();
   translate(this.x + this.width/2, this.y + this.height/2);
   scale(this.expansion);
-  drawingContext.shadowBlur = 32;
-  drawingContext.shadowColor = color(207, 7, 99);
+  dglow(color(207, 7, 99), 32);
   strokeWeight(this.border);
   stroke(255, 7, 99);
   if(this.solid) {
@@ -120,12 +119,9 @@ function drawMenu() {
 }
 
 
-
 function drawSelect() {
-
+// test
 }
-
-
 
 
 function draw() {
@@ -145,4 +141,9 @@ function draw() {
   myPageChanger.draw();
 
   clicked = false;
+}
+
+function glow(color, blurriness) {
+  drawingContext.shadowBlur = blurriness;
+  drawingContext.shadowColor = color;
 }
