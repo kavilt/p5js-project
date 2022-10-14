@@ -82,7 +82,9 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
     this.clicked = false;
     if (mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
       if (this.mouseInTime == 0) {
-        buttonHoverSound.setVolume(0.15);
+        buttonHoverSound.stop();
+        buttonHoverSound.rate(1);
+        buttonHoverSound.setVolume(0.1);
         buttonHoverSound.play();
       }
       this.mouseInTime ++;
@@ -97,6 +99,12 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
         buttonClickSound.play();
       }
     } else {
+      if (this.mouseInTime > 0) { // the user just left the button
+        buttonHoverSound.stop();
+        buttonHoverSound.rate(0.85); // pitch it down a bit
+        buttonHoverSound.setVolume(0.02);
+        buttonHoverSound.play();
+      }
       this.expansion += (1-this.expansion)/6; // quickly shrink to 1x size
       this.mouseInTime = 0;
     }
