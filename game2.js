@@ -7,7 +7,7 @@ let fireAnimation = 0;
 let fireAnimationIncreasing = false;
 
 function initGame2() { // reset gamestate
-    game2score = 0;
+    game2Score = 0;
     game2Lives = 5;
     ducks = [];
 }
@@ -16,6 +16,7 @@ function duck(x, y, vector) {
     this.x = x;
     this.y = y;
     this.v = vector;
+    this.scoreMultiplier = 1; // rapidly spawned ducks award more
 
     this.alive = true;
     this.deathAnimation = 0;
@@ -46,9 +47,9 @@ duck.prototype.update = function() {
         }
     }
 
-    if (clicked && dist(mouseX, mouseY, this.x, this.y) < 80) { // got clicked on
+    if (clicked && dist(mouseX, mouseY, this.x, this.y) < 80 && fireAnimation < 10) { // got clicked on
         this.alive = false;
-        game2Score += 5;
+        game2Score += 5*scoreMultiplier;
     }
 
 }
@@ -87,10 +88,12 @@ function duckSpawner() {
                  // prevent >2 ducks from spawning rapidly
                 this.timeToSpawn = random(0, 100);    
                 this.backToBackCount ++; 
+                scoreMultiplier ++;
             }
             else {
                 this.timeToSpawn = random(100 - game2Difficulty*10, 350 - game2Difficulty*30);
                 this.backToBackCount = 0;
+                scoreMultiplier = 1;
             }
         }
     }
@@ -115,6 +118,8 @@ function drawCrosshair() {
     let crosshairColor = color(0, 0, 2, 90);
     let velocity = dist(pmouseX, pmouseY, mouseX, mouseY); //approximate estimation of cursor speed
     let recoil = sigmoid((fireAnimation)/60, 10, 6)
+
+    push();
     blur(velocity/7); // simulate motion blur
     noCursor();
     translate(mouseX, mouseY);
@@ -137,10 +142,10 @@ function drawCrosshair() {
 
     rectMode(CORNER);
     noBlur();
-    resetMatrix();
+    pop();
 }
 
-function drawUI() {
+function drawGame2UI() {
     // score text
     glow(color(0, 0, 100), 32);
     fill(0, 0, 100);
@@ -167,29 +172,27 @@ function drawUI() {
     else if (game2Difficulty == 1) { text("NORMAL", 60, 80); }
     else if (game2Difficulty == 2) { text("HARD", 60, 80); }
     else if (game2Difficulty == 3) { text("EXTREME", 60, 80); }
-
-
     textAlign(CENTER);
-
-
 }
 
 function drawGame2() { // duck hunt game,  pages 4-4.9
-    // do duck stuff
-    myDuckSpawner.attemptSpawn();
-    drawDucks();
-
-    drawCrosshair();
-
-    drawUI();
-
-    backButton.drawBack();
     if(backButton.clicked) {
         myPageChanger.change(4.1);
     } 
-    else if (clicked) { // if click, start animating recoil 
+    else if (clicked && fireAnimation < 10) { // if click, start animating recoil 
         fireAnimationIncreasing = true;
+        let v = p5.Vector.fromAngle(random(180, 360), 12);
+        myCam.shake(v.x, v.y);
     }
+    // do duck stuff
+    myDuckSpawner.attemptSpawn();
+    drawDucks();
+    
+    drawCrosshair();
+    
+    drawGame2UI();
+
+    backButton.drawBack();
     if (fireAnimationIncreasing) { 
         fireAnimation += 15;
         if (fireAnimation >= 71) {

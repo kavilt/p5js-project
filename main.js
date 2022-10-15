@@ -2,6 +2,8 @@ function draw() {
     cursor(ARROW);
   
     drawBackground();
+
+    myCam.draw();
   
     switch (page) {
         case 0:
@@ -34,5 +36,5 @@ function draw() {
     myPageChanger.update(); // handles page transitions
     myPageChanger.draw();
     clicked = false;
-  }
-  
+}
+

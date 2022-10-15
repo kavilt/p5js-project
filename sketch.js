@@ -147,6 +147,7 @@ button.prototype.drawBorder = function(){ // all buttons inherit this border
 
 // START button
 button.prototype.buttonWithText = function(txt, txtSize) { 
+  push();
   this.drawBorder();
   textSize(txtSize);
   textFont('Consolas');
@@ -154,11 +155,12 @@ button.prototype.buttonWithText = function(txt, txtSize) {
   noStroke();
 
   text(txt, 0, 0);
-  resetMatrix();
+  pop();
 }
 
 // game select screen buttons
 button.prototype.drawGame2 = function() {
+  push();
   this.drawBorder();
   circle(0, 0, 40, 40);
 
@@ -178,11 +180,12 @@ button.prototype.drawGame2 = function() {
   textSize(30);
   text("game 1",-55, 140);
 
-  resetMatrix();
+  pop();
 }
 
 // back button
 button.prototype.drawBack = function() {
+  push();
   this.update();
   translate(this.x + this.width/2, this.y + this.height/2);
   scale(this.expansion);
@@ -192,7 +195,7 @@ button.prototype.drawBack = function() {
   textSize(40);
   text("back", 0, 0);
 
-  resetMatrix();
+  pop();
 }
 
 
@@ -245,7 +248,8 @@ function drawSelect() {
     myPageChanger.change(5);
   }
 
-  glow(color(40, 40, 100), 32)
+  glow(color(40, 40, 100), 32);
+  fill(0, 0, 100);
   textSize(120 - myPageChanger.transitionPercentExponential*3);
   text("game", 640, 100 + myPageChanger.transitionPercentExponential*3);
   textSize(70 - myPageChanger.transitionPercentExponential*2);
@@ -291,6 +295,7 @@ function noBlur() {
 }
 
 function drawImage(img, x, y, percentSizeX, percentSizeY) { // same as image(), but center the image at x, y, and size is from 0-1
+  push();
   translate(x, y);
   if (arguments.length == 4) {
     scale(percentSizeX);
@@ -300,8 +305,43 @@ function drawImage(img, x, y, percentSizeX, percentSizeY) { // same as image(), 
   }
   image(img, -img.width/2, -img.height/2);
 
-  resetMatrix();
+  pop();
 }
+
+function camera() {
+  this.x = 0;
+  this.y = 0;
+  this.vx = 0;
+  this.vy = 0;
+  this.returnSpeed = 1.3;
+  this.timeSinceShake = 100;
+}
+
+camera.prototype.draw = function() {
+  fill(0, 0, 100, 40 - (this.timeSinceShake * 5));
+  rect(-100, -100, 1400, 900);
+  translate(this.x, this.y);
+
+  this.x += this.vx + random(-1, 1) * abs(this.vx)/2;
+  this.y += this.vy + random(-1, 1) * abs(this.vy)/2;
+
+  this.vx /= this.returnSpeed;
+  this.vy /= this.returnSpeed;
+
+  this.x /= this.returnSpeed;
+  this.y /= this.returnSpeed;
+
+  this.timeSinceShake ++;
+
+}
+
+camera.prototype.shake = function(vx, vy) {
+  this.vx = vx;
+  this.vy = vy;
+  this.timeSinceShake = 0;
+}
+
+myCam = new camera();
 
 function mouseClicked() {
   clicked = true; // true only for one frame when the user releases the mouse
