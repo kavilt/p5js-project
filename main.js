@@ -4,25 +4,28 @@ function draw() {
     drawBackground();
   
     switch (page) {
-      case 0:
+        case 0:
         drawMenu();
         break;
-      case 1:
+        case 1:
         drawSelect();
         break;
-      case 2:
+        case 2:
         drawScores();
         break;
-      case 3:
+        case 3:
         drawGame1();
         break;
-      case 4:
+        case 4:
         drawGame2();
         break;
-      case 4.1:
+        case 4.1:
         drawGame2DifficultySelect();
         break;
-      case 5:
+        case 4.2:
+        drawGame2DeathScreen();
+        break;
+        case 5:
         drawGame3();
         break;
     }

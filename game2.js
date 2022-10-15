@@ -71,6 +71,7 @@ function drawDucks() {
 function duckSpawner() {
     this.timeSinceLastDuck = 0;
     this.timeToSpawn = 100; // timeSinceLastDuck value needed in order to successfully spawn new duck
+    this.backToBackCount = 0;
 
     this.attemptSpawn = function() {
         this.timeSinceLastDuck ++;
@@ -81,11 +82,15 @@ function duckSpawner() {
 
             // schedule next duck spawn
             this.timeSinceLastDuck = 0;
-            if (random(0, 1) < 0.2 + game2Difficulty/10) { // small chance that another spawn happens immediately
-                this.timeToSpawn = random(0, 100);
+
+            if (random(0, 1) < 0.2 + game2Difficulty/10 && this.backToBackCount < 2) { // small chance that another spawn happens immediately
+                 // prevent >2 ducks from spawning rapidly
+                this.timeToSpawn = random(0, 100);    
+                this.backToBackCount ++; 
             }
             else {
                 this.timeToSpawn = random(100 - game2Difficulty*10, 350 - game2Difficulty*30);
+                this.backToBackCount = 0;
             }
         }
     }
@@ -110,7 +115,7 @@ function drawCrosshair() {
     let crosshairColor = color(0, 0, 2, 90);
     let velocity = dist(pmouseX, pmouseY, mouseX, mouseY); //approximate estimation of cursor speed
     let recoil = sigmoid((fireAnimation)/60, 10, 6)
-    blur(velocity/7);
+    blur(velocity/7); // simulate motion blur
     noCursor();
     translate(mouseX, mouseY);
     rotate(recoil*20);
@@ -145,6 +150,15 @@ function drawUI() {
 
     textSize(35);
     text("best: " + game2HighScore, 1140, 100);
+    if (game2Score > game2HighScore) {
+        game2HighScore = game2Score;
+    }
+    // health
+    for (let i = 0; i < game2Lives; i ++) {
+        drawImage(heart, 1190 - i * 50, 650, 0.1);
+        drawImage(heart, 1190 - i * 50, 650, 0.1);
+        
+    }
 
     // Difficulty text
     textSize(70);
@@ -184,6 +198,12 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
     }
     if(fireAnimation > 0) {
         fireAnimation -= 2;
+    }
+
+    // switch to death scene if dead
+    if (game2Lives == 0) {
+        game2Lives = -1;
+        myPageChanger.change(4.2);
     }
 }
 
@@ -236,6 +256,45 @@ function drawGame2DifficultySelect() {
     }
 }
 
-function sigmoid(value, scale, offset) {
+function drawGame2DeathScreen() {
+
+    glow(color(0, 100, 100), 32);
+    fill(0, 0, 100);
+    noStroke();
+    textSize(110);
+    text("GAME", 640, 130);
+    textSize(130);
+    text("OVER", 640, 250);
+
+    textAlign(RIGHT);
+    noGlow();
+    textSize(50);
+    fill(0, 0, 80);
+    text("difficulty:", 400, 400);
+    text("score:", 400, 500);
+    text("objects hit:", 950, 400);
+    text("high score:", 950, 500);
+
+    fill(0, 0, 100);
+    glow(color(0, 0, 100), 32);
+    textSize(60);
+    if (game2Difficulty == 0) { text("easy", 600, 400); }
+    else if (game2Difficulty == 1) { text("normal", 600, 400); }
+    else if (game2Difficulty == 2) { text("hard", 600, 400); }
+    else if (game2Difficulty == 3) { textSize(45); text("extreme", 600, 400); }
+    textSize(50);
+    text(game2Score, 600, 500);
+    text(game2Score/5, 1150, 400);
+    text(game2HighScore, 1150, 500);
+
+    textAlign(CENTER);
+
+    backButton.drawBack();
+    if (backButton.clicked) {
+        myPageChanger.change(4.1);
+    }
+}
+
+function sigmoid(value, scale, offset) { // used for recoil animation
     return 1 / (1 + Math.pow(Math.E, -((value*scale)-offset)));
 }

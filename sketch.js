@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 0; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 4.2; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 
 // Declare sound variables
 let buttonClickSound;
@@ -8,6 +8,7 @@ let buttonHoverSound;
 
 // Declare image files
 let title;
+let heart;
 
 let blurShader;
 
@@ -17,6 +18,7 @@ function preload() {
   buttonHoverSound = loadSound("assets/button hover.ogg");
 
   title = loadImage('assets/placeholder.png');
+  heart = loadImage('assets/heart.png');
 
   //blurShader = new p5.Shader(this._renderer, blurVert, blurFrag);
 }
