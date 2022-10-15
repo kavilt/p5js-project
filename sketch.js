@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 1; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 0; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 
 // Declare sound variables
 let buttonClickSound;
@@ -9,12 +9,16 @@ let buttonHoverSound;
 // Declare image files
 let title;
 
+let blurShader;
+
 // Preload sound and image files
 function preload() {
   buttonClickSound = loadSound("assets/menuclick.ogg")
   buttonHoverSound = loadSound("assets/button hover.ogg");
 
   title = loadImage('assets/placeholder.png');
+
+  //blurShader = new p5.Shader(this._renderer, blurVert, blurFrag);
 }
 
 function setup() {
@@ -64,8 +68,6 @@ function pageChanger() { // handles the transitions between pages (fade to black
 }
 var myPageChanger = new pageChanger();
 
-
-
 // buttons can have images inside them
 function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.x = x;
@@ -75,7 +77,7 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.border = thickness; 
   this.roundness = roundness;
   this.solid = solid;
-  this.sound;
+  this.clr;
 
   this.heldDown = false;
   this.clicked = false;
@@ -120,14 +122,16 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
     }
   }
 }
+
 button.prototype.drawBorder = function(){ // all buttons inherit this border
+  if(this.clr == undefined) {this.clr = color(207, 7, 100);}
   this.update();
   translate(this.x + this.width/2, this.y + this.height/2);
   scale(this.expansion);
   rotate((this.expansion-1)*7)
-  glow(color(207, 7, 99), 35);
+  glow(color(this.clr), 35);
   strokeWeight(this.border);
-  stroke(255, 7, 99);
+  stroke(color(this.clr));
   if(this.solid) {
      fill(99 + (this.expansion-1)*70); // brighten when hovered over
   } else {
@@ -136,8 +140,6 @@ button.prototype.drawBorder = function(){ // all buttons inherit this border
   
   rect(-this.width/2, -this.height/2, this.width, this.height, this.roundness);
 }
-
-
 
 // Each button will have its custom function, because they all look different
 
@@ -235,7 +237,7 @@ function drawSelect() {
     myPageChanger.change(3);
   }
   else if (game2Button.clicked) {
-    myPageChanger.change(4);
+    myPageChanger.change(4.1);
   }
   else if (game3Button.clicked) {
     myPageChanger.change(5);
@@ -259,8 +261,7 @@ function drawScores() {
   }
 }
 
-
-
+// game 2 variables
 
 
 
@@ -272,40 +273,6 @@ function drawBackground() {
   triangle(0, 1000 + myPageChanger.transitionPercentExponential * 50, 1280, 720, 1280, 20 - myPageChanger.transitionPercentExponential*50); // small triangle to spice up background
 }
 
-function draw() {
-  cursor(ARROW);
-
-  drawBackground();
-
-  switch (page) {
-    case 0:
-      drawMenu();
-      break;
-    case 1:
-      drawSelect();
-      break;
-    case 2:
-      drawScores();
-      break;
-    case 3:
-      drawGame1();
-      break;
-    case 4:
-      drawGame2();
-      break;
-    case 5:
-      drawGame3();
-      break;
-  }
-
-  resetMatrix();
-  myPageChanger.update(); // handles page transitions
-  myPageChanger.draw();
-  clicked = false;
-}
-
-
-
 function glow(color, blurriness) {
   drawingContext.shadowBlur = blurriness;
   drawingContext.shadowColor = color;
@@ -313,6 +280,12 @@ function glow(color, blurriness) {
 function noGlow() {
   drawingContext.shadowBlur = 0;
   drawingContext.shadowColor = null;
+}
+function blur(blurriness) {
+  drawingContext.filter = 'blur(' + str(blurriness) + 'px)';
+}
+function noBlur() {
+  drawingContext.filter = 'blur(0px)';
 }
 
 function drawImage(img, x, y, percentSizeX, percentSizeY) { // same as image(), but center the image at x, y, and size is from 0-1
