@@ -1,6 +1,9 @@
 
 // Declare Variables
-let page = 4.2; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 5; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let keys = [];
+let typed = [];
+let clicked = false;
 
 // Declare sound variables
 let buttonClickSound;
@@ -31,7 +34,6 @@ function setup() {
 }
 
 
-let clicked = false;
 
 
 function pageChanger() { // handles the transitions between pages (fade to black, then fade in again)
@@ -345,4 +347,13 @@ myCam = new camera();
 
 function mouseClicked() {
   clicked = true; // true only for one frame when the user releases the mouse
+}
+
+function keyPressed() {
+  keys[keyCode] = true;
+  typed[keyCode] = true;
+}
+
+function keyReleased() {
+  keys[keyCode] = false;
 }

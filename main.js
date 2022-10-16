@@ -36,5 +36,6 @@ function draw() {
     myPageChanger.update(); // handles page transitions
     myPageChanger.draw();
     clicked = false;
+    typed = [];
 }
 
