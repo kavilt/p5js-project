@@ -3,8 +3,11 @@ let game2HighScore = 0;
 let game2Lives = 5;
 let game2Difficulty = 2; // 0 = easy, 1 = normal, 2 = hard, 3 = pro
 let ducks = [];
+let scorePopups = [];
 let fireAnimation = 0;
 let fireAnimationIncreasing = false;
+let scoreMultiplier = 1;
+let timeSinceLastKill = 0;
 
 function initGame2() { // reset gamestate
     game2Score = 0;
@@ -12,21 +15,19 @@ function initGame2() { // reset gamestate
     ducks = [];
 }
 
+
 function duck(x, y, vector) {
     this.x = x;
     this.y = y;
     this.v = vector;
-    this.scoreMultiplier = 1; // rapidly spawned ducks award more
 
     this.alive = true;
     this.deathAnimation = 0;
 }
-
 duck.prototype.draw = function() {
     fill(0, 0, 100); 
     circle(this.x, this.y, 80);
 }
-
 // move duck, die if shot, delete if dead
 duck.prototype.update = function() {
     this.x += this.v.x; 
@@ -46,14 +47,19 @@ duck.prototype.update = function() {
             this.alive = false;
         }
     }
-
     if (clicked && dist(mouseX, mouseY, this.x, this.y) < 80 && fireAnimation < 10) { // got clicked on
         this.alive = false;
-        game2Score += 5*scoreMultiplier;
+        if (timeSinceLastKill < 80) { // kills in rapid succession will award more points
+            scoreMultiplier ++;
+            print("DOUBLE");
+        }
+        let inc = 5*scoreMultiplier;
+        scorePopups.push(new scorePopup(this.x+random(-5, 5), this.y - 5, inc));
+        game2Score += inc;
+        timeSinceLastKill = 0;
     }
 
 }
-
 // draws all ducks inside the list ducks[]
 function drawDucks() {
     for (let i = 0; i < ducks.length; i ++) {
@@ -66,8 +72,6 @@ function drawDucks() {
         }
     }
 }
-
-
 // spawns ducks.
 function duckSpawner() {
     this.timeSinceLastDuck = 0;
@@ -88,12 +92,10 @@ function duckSpawner() {
                  // prevent >2 ducks from spawning rapidly
                 this.timeToSpawn = random(0, 100);    
                 this.backToBackCount ++; 
-                scoreMultiplier ++;
             }
             else {
                 this.timeToSpawn = random(100 - game2Difficulty*10, 350 - game2Difficulty*30);
                 this.backToBackCount = 0;
-                scoreMultiplier = 1;
             }
         }
     }
@@ -111,8 +113,8 @@ function duckSpawner() {
         ))
     }
 }
-
 myDuckSpawner = new duckSpawner();
+
 
 function drawCrosshair() {
     let crosshairColor = color(0, 0, 2, 90);
@@ -176,6 +178,10 @@ function drawGame2UI() {
 }
 
 function drawGame2() { // duck hunt game,  pages 4-4.9
+    timeSinceLastKill ++;
+    if (timeSinceLastKill > 80) {
+        scoreMultiplier = 1;
+    }
     if(backButton.clicked) {
         myPageChanger.change(4.1);
     } 
@@ -187,6 +193,8 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
     // do duck stuff
     myDuckSpawner.attemptSpawn();
     drawDucks();
+
+    drawScorePopups();
     
     drawCrosshair();
     
@@ -210,6 +218,7 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
     }
 }
 
+
 let easyButton = new button(640 + 150, 100, 200, 90, 10, 10);
 let normalButton = new button(640 + 170, 245, 200, 90, 10, 10);
 normalButton.clr = [90, 20, 100];
@@ -217,7 +226,6 @@ let hardButton = new button(640 + 190, 390, 200, 90, 10, 10);
 hardButton.clr = [20, 20, 100];
 let extremeButton = new button(640 + 210, 535, 200, 90, 10, 10);
 extremeButton.clr = [0, 30, 100];
-
 function drawGame2DifficultySelect() {
 
     glow(color(40, 30, 100), 32);
@@ -298,6 +306,48 @@ function drawGame2DeathScreen() {
     }
 }
 
+// utility functions
 function sigmoid(value, scale, offset) { // used for recoil animation
     return 1 / (1 + Math.pow(Math.E, -((value*scale)-offset)));
+}
+
+
+function scorePopup(x, y, value) {
+    this.x = x;
+    this.y = y;
+    this.vely = 10;
+    this.velx = random(-1, 1); 
+    this.timeAlive = 0;
+    this.alive = true;
+    this.value = value;
+    this.draw = function() {
+        this.timeAlive ++;
+        fill(50, 70, 100, 110 - Math.pow(this.timeAlive, 1.2));
+        glow(50, 100, 100);
+        noStroke();
+        textSize(40 + this.value/2 + this.timeAlive/4);
+        text(this.value, this.x, this.y);
+
+        this.x += this.velx;
+        this.y -= this.vely;
+
+        this.vely /= 1.2;
+        this.velx /= 1.3;
+
+        if (this.timeAlive > 50) {
+            this.alive = false;
+        }
+        noGlow();
+    }
+}
+
+function drawScorePopups() {
+    for (let i = 0; i < scorePopups.length; i ++) {
+        if (scorePopups[i] != null && scorePopups[i].alive){
+            scorePopups[i].draw();
+        } 
+        else { // remove scorePopup from list
+            scorePopups[i] = null;
+        }
+    }
 }
