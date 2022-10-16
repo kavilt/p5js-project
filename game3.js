@@ -8,6 +8,9 @@ let laneHeight = 600;
 let laneStartY = 50;
 let laneStartX = 300;
 
+let hits = [];
+let combo = 0;
+
 let controls = [68, 70, 74, 75]; // DF JK by default
 
 function lane(x, y, height, indx) { // each lane keeps track of notes
@@ -40,22 +43,45 @@ lane.prototype.drawLane = function() {
   // flash lane red if missed
   fill(0, 100, 100, this.missAnimation);
   rect(this.x, this.y, laneWidth, laneHeight);
-  this.missAnimation -= 10;
+  this.missAnimation -= 8;
 }
 
 lane.prototype.update = function() {
   // update the notes
   for (let i = 0; i < this.notes.length; i ++) {
-    if(this.notes[i] != null) {
       this.notes[i].update();
-    }
   }
 
   // test whether the user hit the note
 
   // on keyboard:
-  if (typed[controls[this.ind]]) { // if the key corresponding to the lane was pressed:
-    this.notes.splice(0, 1);
+
+  // if the key corresponding to the lane was pressed:
+  if (typed[controls[this.ind]]) { 
+    if (this.notes.length > 0) {
+      if (this.notes[0].positionFromPerfect > -60) {
+        
+        combo ++;
+
+        // calculate hit judgement
+        if (Math.abs(this.notes[0].positionFromPerfect) < 30) {
+          hits.push(300); // perfect!
+        }
+        else if (Math.abs(this.notes[0].positionFromPerfect) < 40) {
+          hits.push(200); // okay
+        }
+        else if (Math.abs(this.notes[0].positionFromPerfect) < 50) {
+          hits.push(100); // bad :(
+        }
+
+        this.notes.splice(0, 1); //remove the note!
+      } else if (this.notes[0].positionFromPerfect < -60 && this.notes[0].positionFromPerfect > -200) { // if its 100px too early, ignore
+        this.notes.splice(0, 1);
+        this.missAnimation = 50;
+        combo = 0;
+        hits.push(0); // miss :(
+      }
+    }
   }
 }
 
@@ -70,8 +96,10 @@ lane.prototype.drawNotes = function() {
       fill(color(90, 90, 80, opacity));
       noStroke();
       circle(this.x + laneWidth/2, this.notes[i].position + this.y, laneWidth/3);
-      if (!this.notes[i].alive) {
-        this.missAnimation = 70;
+      if (!this.notes[i].alive) { // notes scrolled off the screen, weren't hit
+        combo = 0;
+        this.missAnimation = 50;
+        hits.push(0);
         this.notes.splice(i, 1);
       }
     }
@@ -81,13 +109,16 @@ lane.prototype.drawNotes = function() {
 
 function note() {
   this.position = 0;
-  this.alive = true;;
+  this.alive = true;
+  this.positionFromPerfect = 0;
 
   this.update = function() {
     this.position += scrollSpeed;
     if(this.position > laneStartY + laneHeight + 50) {
       this.alive = false;
     }
+
+    this.positionFromPerfect = this.position - (laneHeight - laneWidth/2); // negative values = early
   }
 }
 
@@ -99,8 +130,8 @@ for (let i = 0; i < numLanes; i ++) {
 
 function drawLanes() {
   for (let i = 0; i < lanes.length; i ++) {
-    lanes[i].drawLane();
     lanes[i].update();
+    lanes[i].drawLane();
   }
 }
 
@@ -108,18 +139,41 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
 
   drawLanes();
 
-  if (frameCount % 20 == 0) {
-    let tempLane = round(random(2, 4));
+  if (frameCount % 14 == 0) {
+    let tempLane = round(random(1, 4));
+    let laneSpawns = [];
     for (let i = 0; i < tempLane; i ++) {
-      lanes[round(random(0, 3))].addNote();
+      laneSpawns[round(random(0, 3))] = true;
+    }
+    for (let i = 0; i < laneSpawns.length; i ++) {
+      if (laneSpawns[i]) {
+        lanes[i].addNote();
+      }
     }
   }
 
+  textSize(80);
+  fill(0, 0, 100, 50);
+  noStroke();
+  text(combo, laneStartX + (numLanes/2) * laneWidth, 200);
   
+  text(round(calculateAccuracy()*100, 2), 800, 200);
 
 
-backButton.drawBack();
-if(backButton.clicked) {
-  myPageChanger.change(1);
+  backButton.drawBack();
+  if(backButton.clicked) {
+    myPageChanger.change(1);
+  }
 }
+
+function calculateAccuracy() {
+  let sum = 0;
+  if (hits.length == 0) {
+    return 1;
+  }
+  for(let i = 0; i < hits.length; i ++) {
+    sum += hits[i];
+  }
+  print(sum + "," + hits.length * 300);
+  return sum / (300*hits.length);
 }
