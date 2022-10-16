@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 5; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 1; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 let keys = [];
 let typed = [];
 let clicked = false;
@@ -13,17 +13,14 @@ let buttonHoverSound;
 let title;
 let heart;
 
-let blurShader;
-
 // Preload sound and image files
 function preload() {
-  buttonClickSound = loadSound("assets/menuclick.ogg")
-  buttonHoverSound = loadSound("assets/button hover.ogg");
+  buttonClickSound = new Howl({src: "assets/menuclick.ogg"});
+  buttonHoverSound = new Howl({src: "assets/button hover.ogg"})
 
   title = loadImage('assets/placeholder.png');
   heart = loadImage('assets/heart.png');
 
-  //blurShader = new p5.Shader(this._renderer, blurVert, blurFrag);
 }
 
 function setup() {
@@ -91,10 +88,9 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.update = function() {
     this.clicked = false;
     if (mouseX > this.x && mouseX < this.x + this.width && mouseY > this.y && mouseY < this.y + this.height) {
-      if (this.mouseInTime == 0) {
-        buttonHoverSound.stop();
+      if (this.mouseInTime == 0) { // play hover sound
         buttonHoverSound.rate(1);
-        buttonHoverSound.setVolume(0.1);
+        buttonHoverSound.volume(0.1);
         buttonHoverSound.play();
       }
       this.mouseInTime ++;
@@ -109,16 +105,14 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
         this.expansion = 1.05;
       }else{ this.heldDown = false; }
       if (clicked) {
-        this.clicked = true;
-        buttonClickSound.stop();
+        this.clicked = true; // the user clicked and released the button
         buttonClickSound.rate(1);
         buttonClickSound.play();
       }
     } else {
       if (this.mouseInTime > 0) { // the user just left the button
-        buttonHoverSound.stop();
         buttonHoverSound.rate(0.85); // pitch it down a bit
-        buttonHoverSound.setVolume(0.02);
+        buttonHoverSound.volume(0.02);
         buttonHoverSound.play();
       }
       this.expansion += (1-this.expansion)/6; // quickly shrink to 1x size

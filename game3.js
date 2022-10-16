@@ -1,17 +1,26 @@
 
+let controls = [68, 70, 74, 75]; // DF JK by default
+
 let scrollSpeed = 16;
 let game3Difficulty = 2; // 0 = easy, 3 = extreme
 let lanes = [];
-let numLanes = 4;
+let numLanes = controls.length;
 let laneWidth = 80;
 let laneHeight = 600;
 let laneStartY = 50;
-let laneStartX = 300;
+let laneStartX = 700;
 
+let recentHit = 0;
+let timeSinceLastHit = 0;
 let hits = [];
 let combo = 0;
 
-let controls = [68, 70, 74, 75]; // DF JK by default
+let leniency = 5; // how many frames can the user be off by, and still receive max?
+
+function initGame3() {
+  hits = [];
+  combo = 0;
+}
 
 function lane(x, y, height, indx) { // each lane keeps track of notes
   this.x = x;
@@ -30,17 +39,20 @@ lane.prototype.addNote = function() {
 
 lane.prototype.drawLane = function() {
   // Outline of lane
-  stroke(0, 0, 0);
   noGlow();
+  stroke(0, 0, 0);
   fill(color(0, 0, 70, 50));
   rect(this.x, this.y, laneWidth, laneHeight);
 
+  stroke(0, 0, 30);
   line(this.x, this.y + this.height - laneWidth, this.x + laneWidth, this.y + this.height - laneWidth);
+  stroke(0,0,0);
 
   // draw individual notes in lane
   this.drawNotes();
 
   // flash lane red if missed
+  noGlow();
   fill(0, 100, 100, this.missAnimation);
   rect(this.x, this.y, laneWidth, laneHeight);
   this.missAnimation -= 8;
@@ -57,25 +69,29 @@ lane.prototype.update = function() {
   // on keyboard:
 
   // if the key corresponding to the lane was pressed:
-  if (typed[controls[this.ind]]) { 
+  if (typed[controls[this.ind]]) {
+    buttonClickSound.stop();
+    buttonClickSound.play(); 
     if (this.notes.length > 0) {
-      if (this.notes[0].positionFromPerfect > -60) {
-        
+      if (this.notes[0].timeToPF > -leniency*3) {
         combo ++;
-
+        timeSinceLastHit = 0;
         // calculate hit judgement
-        if (Math.abs(this.notes[0].positionFromPerfect) < 30) {
+        if (Math.abs(this.notes[0].timeToPF) < leniency) {
           hits.push(300); // perfect!
+          recentHit = 300;
         }
-        else if (Math.abs(this.notes[0].positionFromPerfect) < 40) {
+        else if (Math.abs(this.notes[0].timeToPF) < leniency*2) {
           hits.push(200); // okay
+          recentHit = 200;
         }
-        else if (Math.abs(this.notes[0].positionFromPerfect) < 50) {
+        else if (Math.abs(this.notes[0].timeToPF) < leniency*2.5) {
           hits.push(100); // bad :(
+            recentHit = 100;
         }
 
         this.notes.splice(0, 1); //remove the note!
-      } else if (this.notes[0].positionFromPerfect < -60 && this.notes[0].positionFromPerfect > -200) { // if its 100px too early, ignore
+      } else if (this.notes[0].timeToPF < -leniency*3 && this.notes[0].timeToPF > -leniency*6) { // if its 100px too early, ignore
         this.notes.splice(0, 1);
         this.missAnimation = 50;
         combo = 0;
@@ -110,7 +126,7 @@ lane.prototype.drawNotes = function() {
 function note() {
   this.position = 0;
   this.alive = true;
-  this.positionFromPerfect = 0;
+  this.timeToPF = 0; // amount of frames that need to pass in order for the note hit to be "perfect"
 
   this.update = function() {
     this.position += scrollSpeed;
@@ -118,7 +134,11 @@ function note() {
       this.alive = false;
     }
 
-    this.positionFromPerfect = this.position - (laneHeight - laneWidth/2); // negative values = early
+    this.timeToPF = (this.position - (laneHeight - laneWidth/2)) / scrollSpeed;
+    if (this.timeToPF == 0) {
+      buttonHoverSound.stop();
+      buttonHoverSound.play();
+    }
   }
 }
 
@@ -139,11 +159,12 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
 
   drawLanes();
 
-  if (frameCount % 14 == 0) {
-    let tempLane = round(random(1, 4));
+  // spawn notes
+  if (frameCount % 12 == 0) {
+    let tempLane = round(random(0.7, 2.2));
     let laneSpawns = [];
     for (let i = 0; i < tempLane; i ++) {
-      laneSpawns[round(random(0, 3))] = true;
+      laneSpawns[round(random(0, numLanes-1))] = true;
     }
     for (let i = 0; i < laneSpawns.length; i ++) {
       if (laneSpawns[i]) {
@@ -152,18 +173,26 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
     }
   }
 
+  // text stats
   textSize(80);
   fill(0, 0, 100, 50);
   noStroke();
   text(combo, laneStartX + (numLanes/2) * laneWidth, 200);
   
-  text(round(calculateAccuracy()*100, 2), 800, 200);
+  textAlign(RIGHT);
+  text(round(calculateAccuracy()*100, 2), 1210, 80);
+  textAlign(CENTER);
+
+  fill(0, 0, 100, 70-timeSinceLastHit*5);
+  text(recentHit, laneStartX + (numLanes/2) * laneWidth, 300);
 
 
   backButton.drawBack();
   if(backButton.clicked) {
     myPageChanger.change(1);
   }
+
+  timeSinceLastHit ++;
 }
 
 function calculateAccuracy() {
@@ -174,6 +203,5 @@ function calculateAccuracy() {
   for(let i = 0; i < hits.length; i ++) {
     sum += hits[i];
   }
-  print(sum + "," + hits.length * 300);
   return sum / (300*hits.length);
 }

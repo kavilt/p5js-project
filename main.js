@@ -31,7 +31,7 @@ function draw() {
         drawGame3();
         break;
     }
-  
+
     resetMatrix();
     myPageChanger.update(); // handles page transitions
     myPageChanger.draw();
