@@ -15,7 +15,7 @@ let timeSinceLastHit = 0;
 let hits = [];
 let combo = 0;
 
-let leniency = 5; // how many frames can the user be off by, and still receive max?
+let leniency = 4.5; // how many frames can the user be off by, and still receive max?
 
 function initGame3() {
   hits = [];
@@ -28,6 +28,8 @@ function lane(x, y, height, indx) { // each lane keeps track of notes
   this.height = height;
   this.ind = indx;
   this.missAnimation = 0;
+  this.hitAnimation = 0;
+  this.hitColor = [0, 0, 0, 0];
   
   this.notes = [];
   this.x
@@ -41,7 +43,7 @@ lane.prototype.drawLane = function() {
   // Outline of lane
   noGlow();
   stroke(0, 0, 0);
-  fill(color(0, 0, 70, 50));
+  fill(color(0, 0, 35, 50));
   rect(this.x, this.y, laneWidth, laneHeight);
 
   stroke(0, 0, 30);
@@ -53,9 +55,19 @@ lane.prototype.drawLane = function() {
 
   // flash lane red if missed
   noGlow();
-  fill(0, 100, 100, this.missAnimation);
+  gradient(color(0, 100, 100, this.missAnimation), color(0, 100, 100, 0), this.x + laneWidth/2, this.y + laneHeight, this.x + laneWidth/2, this.y);
   rect(this.x, this.y, laneWidth, laneHeight);
-  this.missAnimation -= 8;
+  noGradient();
+  this.missAnimation -= 5;
+  this.hitAnimation -= 5;
+  this.hitColorEnd = [...this.hitColor]; // make a copy without same reference
+  this.hitColorEnd[3] = 0;
+  this.hitColor[3] = this.hitAnimation;
+  
+  // small glow when keys are pressed
+  gradient(color(this.hitColor), color(this.hitColorEnd), this.x + laneWidth/2, this.y + laneHeight, this.x + laneWidth/2, this.y + laneHeight - laneHeight/2);
+  rect(this.x, this.y, laneWidth, laneHeight);
+  noGradient();
 }
 
 lane.prototype.update = function() {
@@ -70,24 +82,29 @@ lane.prototype.update = function() {
 
   // if the key corresponding to the lane was pressed:
   if (typed[controls[this.ind]]) {
+    this.hitColor = [0, 0, 100, 100]; // if the user hit literally nothing
+    this.hitAnimation = 70;
     buttonClickSound.stop();
     buttonClickSound.play(); 
     if (this.notes.length > 0) {
       if (this.notes[0].timeToPF > -leniency*3) {
         combo ++;
         timeSinceLastHit = 0;
-        // calculate hit judgement
+        // calculate hit judgement (and set hit color)
         if (Math.abs(this.notes[0].timeToPF) < leniency) {
           hits.push(300); // perfect!
           recentHit = 300;
+          this.hitColor = [200, 100, 100, 100];
         }
         else if (Math.abs(this.notes[0].timeToPF) < leniency*2) {
           hits.push(200); // okay
           recentHit = 200;
+          this.hitColor = [60, 100, 100, 100];
         }
         else if (Math.abs(this.notes[0].timeToPF) < leniency*2.5) {
           hits.push(100); // bad :(
             recentHit = 100;
+            this.hitColor = [270, 100, 100, 100];
         }
 
         this.notes.splice(0, 1); //remove the note!

@@ -283,6 +283,22 @@ function noGlow() {
   drawingContext.shadowBlur = 0;
   drawingContext.shadowColor = null;
 }
+
+let oldFillStyle;
+let oldStrokeStyle;
+function gradient(color1, color2, x1, y1, x2, y2) {
+  let grad =  drawingContext.createLinearGradient(x1, y1, x2, y2);
+  grad.addColorStop(0, color1);
+  grad.addColorStop(1, color2);
+  oldFillStyle = drawingContext.fillStyle;
+  oldStrokeStyle = drawingContext.strokeStyle;
+  drawingContext.fillStyle = grad;
+  drawingContext.strokeStyle = grad;
+}
+function noGradient() {
+  drawingContext.fillStyle = oldFillStyle;
+  drawingContext.strokeStyle = oldStrokeStyle;
+}
 function blur(blurriness) {
   drawingContext.filter = 'blur(' + str(blurriness) + 'px)';
 }
