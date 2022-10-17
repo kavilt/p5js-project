@@ -47,7 +47,7 @@ function pageChanger() { // handles the transitions between pages (fade to black
       this.alpha -= 4;
       if (this.alpha < 0) {
         this.decreasing = false;
-        if (this.targetPage != null) {page = this.targetPage; print("hi");}
+        if (this.targetPage != null) {page = this.targetPage; }
       }
     } else {
       this.alpha += 6;
