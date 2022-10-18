@@ -4,6 +4,8 @@ let page = 1; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 let keys = [];
 let typed = [];
 let clicked = false;
+let scalarW = (w/1280);
+let scalarH = (h/720);
 
 // Declare sound variables
 let buttonClickSound;
@@ -14,6 +16,7 @@ let title;
 let heart;
 
 // Preload sound and image files
+
 function preload() {
   buttonClickSound = new Howl({src: "assets/menuclick.ogg"});
   buttonHoverSound = new Howl({src: "assets/button hover.ogg"})
@@ -24,13 +27,11 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(1280, 720);
+  createCanvas(constrain(windowWidth, 0, 1920), constrain(windowHeight, 0, 1080));
   colorMode(HSB, 360, 100, 100, 100);
   textAlign(CENTER, CENTER);
   angleMode(DEGREES);
 }
-
-
 
 
 function pageChanger() { // handles the transitions between pages (fade to black, then fade in again)
@@ -163,18 +164,18 @@ button.prototype.drawGame2 = function() {
   noStroke();
   glow(color(200, 100, 100), 32);
   fill(222, 82.6, 27.1); // slightly lighter blue
-  rect(-this.width/2 + 20, 110, 150, 60, 10);
+  rect(-this.width/2 + 20, this.height/2 - 44, 150, 60, 10);
 
   glow(color(0, 0, 100), 32);
   noFill();
   stroke(0, 0, 100);
   strokeWeight(5);
-  rect(-this.width/2 + 20, 110, 150, 60, 10);
+  rect(-this.width/2 + 20, this.height/2 - 44, 150, 60, 10);
 
   noStroke();
   fill(0, 0, 100);
   textSize(30);
-  text("game 1",-55, 140);
+  text("game 1",-this.width/2 + 95, this.height/2 - 16);
 
   pop();
 }
@@ -197,14 +198,13 @@ button.prototype.drawBack = function() {
 
 
 // main menu (page = 0)
-
-let startButton = new button(500, 350, 280, 100, 8, 10);
-let scoresButton = new button(500, 520, 280, 100, 8, 10);
-let backButton = new button(30, 720-30-60, 150, 60, 10, 10);
+let startButton = new button(w/2-(140*scalarW), 320*scalarH, 280*scalarW, 100*scalarW, 8, 10);
+let scoresButton = new button(w/2-(140*scalarW), 520*scalarH, 280*scalarW, 100*scalarW, 8, 10);
+let backButton = new button(30, h-30-60, 150, 60, 10, 10);
 function drawMenu() {
-  startButton.buttonWithText("start", 60);
-  scoresButton.buttonWithText("view scores", 40);
-  drawImage(title, width/2, 140 - myPageChanger.transitionPercentExponential*5, 1+myPageChanger.transitionPercentExponential/50);
+  startButton.buttonWithText("start", 60*scalarH);
+  scoresButton.buttonWithText("view scores", 40*scalarH);
+  drawImage(title, width/2, (140*scalarH) - myPageChanger.transitionPercentExponential*5, 1+myPageChanger.transitionPercentExponential/50);
   if (startButton.clicked) {
     myPageChanger.change(1); // go to game select screen
   }
@@ -213,18 +213,39 @@ function drawMenu() {
   }
 }
 
-
+let game1Button;
+let game2Button;
+let game3Button;
 // selection screen (page = 1)
-
-let game1Button = new button(640-530, 230, 150*2, 150*2, 10, 10);
-let game2Button = new button(640-150, 280, 150*2, 150*2, 10, 10);
-let game3Button = new button(640+230, 330, 150*2, 150*2, 10, 10);
+let selectScale = 300*(w/1280); // scale button sizes
+if (scalarH > 0.6) {
+  game1Button = new button(w/2-selectScale-(230*(w/1280)), 230*scalarH, selectScale, selectScale, 10*scalarW, 10);
+  game2Button = new button(w/2-selectScale/2, 280*scalarH, selectScale, selectScale, 10*scalarW, 10);
+  game3Button = new button(w/2+(230*(w/1280)), (330*scalarH), selectScale, selectScale, 10*scalarW, 10);
+}
+else{
+  game1Button = new button(w/2-selectScale-(230*(w/1280)), 90*scalarH, selectScale, selectScale, 10*scalarW, 10);
+  game2Button = new button(w/2-selectScale/2, 190*scalarH, selectScale, selectScale, 10*scalarW, 10);
+  game3Button = new button(w/2+(230*(w/1280)), (290*scalarH), selectScale, selectScale, 10*scalarW, 10);
+}
 function drawSelect() {
   // circles
-  fill(222, 82, 33, 50);
-  circle(1170, 50, 310);
-  fill(222, 82, 31);
-  circle(1270, 170, 160);
+  
+    if(scalarH > 0.6) {
+      glow(color(40, 40, 100), 32);
+      fill(0, 0, 100);
+      textSize((120*scalarH) - myPageChanger.transitionPercentExponential*3);
+      text("game", w/2, (100*scalarH) + myPageChanger.transitionPercentExponential*3);
+      textSize((70*scalarH) - myPageChanger.transitionPercentExponential*2);
+      text("select", w/2, (190*scalarH) + myPageChanger.transitionPercentExponential*5);
+    } else {
+      glow(color(40, 40, 100), 32);
+      fill(0, 0, 100);
+      textSize((120*scalarH) - myPageChanger.transitionPercentExponential*3);
+      text("game", w*0.78, (100*scalarH) + myPageChanger.transitionPercentExponential*3);
+      textSize((70*scalarH) - myPageChanger.transitionPercentExponential*2);
+      text("select", w*0.81, (190*scalarH) + myPageChanger.transitionPercentExponential*5);
+    }
 
   game1Button.drawGame2();
   game2Button.drawGame2();
@@ -244,12 +265,6 @@ function drawSelect() {
     myPageChanger.change(5);
   }
 
-  glow(color(40, 40, 100), 32);
-  fill(0, 0, 100);
-  textSize(120 - myPageChanger.transitionPercentExponential*3);
-  text("game", 640, 100 + myPageChanger.transitionPercentExponential*3);
-  textSize(70 - myPageChanger.transitionPercentExponential*2);
-  text("select", 640, 190 + myPageChanger.transitionPercentExponential*5);
 }
 
 
@@ -272,7 +287,7 @@ function drawScores() {
 function drawBackground() {
   background(222, 82.6, 27.1);
   fill(222, 80, 24);
-  triangle(0, 1000 + myPageChanger.transitionPercentExponential * 50, 1280, 720, 1280, 20 - myPageChanger.transitionPercentExponential*50); // small triangle to spice up background
+  triangle(0, 1000*scalarW + myPageChanger.transitionPercentExponential * 50, w, h, w, 20*scalarH - myPageChanger.transitionPercentExponential*50); // small triangle to spice up background
 }
 
 function glow(color, blurriness) {
@@ -331,7 +346,7 @@ function camera() {
 
 camera.prototype.draw = function() {
   fill(0, 0, 100, 40 - (this.timeSinceShake * 5));
-  rect(-100, -100, 1400, 900);
+  rect(-100, -100, w+200, h+200);
   translate(this.x, this.y);
 
   this.x += this.vx + random(-1, 1) * abs(this.vx)/2;
@@ -357,6 +372,10 @@ myCam = new camera();
 
 function mouseClicked() {
   clicked = true; // true only for one frame when the user releases the mouse
+}
+
+function touchEnded() { // for mobile
+  clicked = true;
 }
 
 function keyPressed() {

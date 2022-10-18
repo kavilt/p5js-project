@@ -212,6 +212,17 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
   timeSinceLastHit ++;
 }
 
+
+/** User can:
+ * choose song using scroll list (right side)
+ * choose from 4 different difficulties for each song (Left side)
+ */
+function drawGame3SongSelect() {
+
+}
+
+
+
 function calculateAccuracy() {
   let sum = 0;
   if (hits.length == 0) {

@@ -1,3 +1,5 @@
+
+
 function draw() {
     cursor(ARROW);
   
@@ -30,7 +32,10 @@ function draw() {
         case 5:
         drawGame3();
         break;
+        case 5.1:
+        drawGame3SongSelect();
     }
+
 
     resetMatrix();
     myPageChanger.update(); // handles page transitions

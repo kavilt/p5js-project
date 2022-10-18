@@ -26,7 +26,7 @@ function duck(x, y, vector) {
 }
 duck.prototype.draw = function() {
     fill(0, 0, 100); 
-    circle(this.x, this.y, 80);
+    circle(this.x, this.y, 80*scalarW);
 }
 // move duck, die if shot, delete if dead
 duck.prototype.update = function() {
@@ -49,9 +49,8 @@ duck.prototype.update = function() {
     }
     if (clicked && dist(mouseX, mouseY, this.x, this.y) < 80 && fireAnimation < 10) { // got clicked on
         this.alive = false;
-        if (timeSinceLastKill < 80) { // kills in rapid succession will award more points
+        if (timeSinceLastKill < 80 * scalarW) { // kills in rapid succession will award more points
             scoreMultiplier ++;
-            print("DOUBLE");
         }
         let inc = 5*scoreMultiplier;
         scorePopups.push(new scorePopup(this.x+random(-5, 5), this.y - 5, inc));
@@ -83,8 +82,6 @@ function duckSpawner() {
         if (this.timeSinceLastDuck > this.timeToSpawn) { // ITS SPAWNIN TIME
             // spawn a duck!
             this.spawn();
-            print("spawned");
-
             // schedule next duck spawn
             this.timeSinceLastDuck = 0;
 
@@ -101,15 +98,15 @@ function duckSpawner() {
     }
 
     this.spawn = function() {
-        let duckX = -100;
-        let duckVector = createVector(random(5+game2Difficulty*1.5, 9+game2Difficulty*2.5), -random(1, 3) - game2Difficulty/2);
+        let duckX = -100*scalarW;
+        let duckVector = createVector(random(5+game2Difficulty*1.5, 9+game2Difficulty*2.5)*scalarW, (-random(1, 3) - game2Difficulty/2)*scalarH);
         if (random(0, 1) > 0.5) { // randomly decide which side of the screen the duck appears on
             duckX = 1380;
             duckVector.x = -duckVector.x;
         }
 
         ducks.push(new duck(
-            duckX, random(300, 600), duckVector
+            duckX, random(400*scalarH, 600*scalarH), duckVector
         ))
     }
 }
@@ -152,32 +149,37 @@ function drawGame2UI() {
     glow(color(0, 0, 100), 32);
     fill(0, 0, 100);
     noStroke();
-    textSize(45);
-    text("score: " + game2Score, 1140, 60);
+    textSize(45*scalarW);
+    text("score: " + game2Score, 1140*scalarW, 60*scalarH);
 
-    textSize(35);
-    text("best: " + game2HighScore, 1140, 100);
+    textSize(35*scalarW);
+    text("best: " + game2HighScore, 1140*scalarW, 100*scalarH);
     if (game2Score > game2HighScore) {
         game2HighScore = game2Score;
     }
     // health
     for (let i = 0; i < game2Lives; i ++) {
-        drawImage(heart, 1190 - i * 50, 650, 0.1);
-        drawImage(heart, 1190 - i * 50, 650, 0.1);
+        drawImage(heart, (1190*scalarW) - (i * 50), 650*scalarH, 0.1);
+        drawImage(heart, (1190*scalarW) - (i * 50), 650*scalarH, 0.1);
         
     }
 
     // Difficulty text
-    textSize(70);
+    textSize(70*scalarW);
     textAlign(LEFT);
-    if (game2Difficulty == 0) { text("EASY", 60, 80); }
-    else if (game2Difficulty == 1) { text("NORMAL", 60, 80); }
-    else if (game2Difficulty == 2) { text("HARD", 60, 80); }
-    else if (game2Difficulty == 3) { text("EXTREME", 60, 80); }
+    if (game2Difficulty == 0) { text("EASY", 60*scalarW, 80*scalarH); }
+    else if (game2Difficulty == 1) { text("NORMAL", 60*scalarW, 80*scalarH); }
+    else if (game2Difficulty == 2) { text("HARD", 60*scalarW, 80*scalarH); }
+    else if (game2Difficulty == 3) { text("EXTREME", 60*scalarW, 80*scalarH); }
     textAlign(CENTER);
 }
 
 function drawGame2() { // duck hunt game,  pages 4-4.9
+
+    if (mouseIsPressed) {
+        clicked = true;
+    }
+
     timeSinceLastKill ++;
     if (timeSinceLastKill > 80) {
         scoreMultiplier = 1;
@@ -219,22 +221,22 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
 }
 
 
-let easyButton = new button(640 + 150, 100, 200, 90, 10, 10);
-let normalButton = new button(640 + 170, 245, 200, 90, 10, 10);
+let easyButton = new button((640 + 150)*scalarW, 100*scalarH, 200, 90, 10, 10);
+let normalButton = new button((640 + 170)*scalarW, 245*scalarH, 200, 90, 10, 10);
 normalButton.clr = [90, 20, 100];
-let hardButton = new button(640 + 190, 390, 200, 90, 10, 10);
+let hardButton = new button((640 + 190)*scalarW, 390*scalarH, 200, 90, 10, 10);
 hardButton.clr = [20, 20, 100];
-let extremeButton = new button(640 + 210, 535, 200, 90, 10, 10);
+let extremeButton = new button((640 + 210)*scalarW, 535*scalarH, 200, 90, 10, 10);
 extremeButton.clr = [0, 30, 100];
 function drawGame2DifficultySelect() {
 
     glow(color(40, 30, 100), 32);
     noStroke();
     fill(0, 0, 100);
-    textSize(100 + myPageChanger.transitionPercentExponential*4);
-    text("game title", 350 - myPageChanger.transitionPercentExponential * 11, 290);
-    textSize(90 + myPageChanger.transitionPercentExponential*2.5);
-    text("difficulty", 390 - myPageChanger.transitionPercentExponential * 6, 420);
+    textSize((100*scalarW) + myPageChanger.transitionPercentExponential*4);
+    text("game title", 350 - myPageChanger.transitionPercentExponential * 11, 290*scalarH);
+    textSize((90*scalarW) + myPageChanger.transitionPercentExponential*2.5);
+    text("difficulty", 390 - myPageChanger.transitionPercentExponential * 6, 420*scalarH);
 
     easyButton.buttonWithText("easy", 40);
     normalButton.buttonWithText("normal", 40);
@@ -272,31 +274,31 @@ function drawGame2DeathScreen() {
     glow(color(0, 100, 100), 32);
     fill(0, 0, 100);
     noStroke();
-    textSize(110);
-    text("GAME", 640, 130);
-    textSize(130);
-    text("OVER", 640, 250);
+    textSize(110*scalarW);
+    text("GAME", 640*scalarW, 130*scalarH);
+    textSize(130*scalarW);
+    text("OVER", 640*scalarW, 250*scalarH);
 
     textAlign(RIGHT);
     noGlow();
-    textSize(50);
+    textSize(50*scalarW);
     fill(0, 0, 80);
-    text("difficulty:", 400, 400);
-    text("score:", 400, 500);
-    text("objects hit:", 950, 400);
-    text("high score:", 950, 500);
+    text("difficulty:", 400*scalarW, 400*scalarH);
+    text("score:", 400*scalarW, 500*scalarH);
+    text("objects hit:", 950*scalarW, 400*scalarH);
+    text("high score:", 950*scalarW, 500*scalarH);
 
     fill(0, 0, 100);
     glow(color(0, 0, 100), 32);
-    textSize(60);
-    if (game2Difficulty == 0) { text("easy", 600, 400); }
-    else if (game2Difficulty == 1) { text("normal", 600, 400); }
-    else if (game2Difficulty == 2) { text("hard", 600, 400); }
-    else if (game2Difficulty == 3) { textSize(45); text("extreme", 600, 400); }
-    textSize(50);
-    text(game2Score, 600, 500);
-    text(game2Score/5, 1150, 400);
-    text(game2HighScore, 1150, 500);
+    textSize(60*scalarW);
+    if (game2Difficulty == 0) { text("easy", 600*scalarW, 400*scalarH); }
+    else if (game2Difficulty == 1) { text("normal", 600*scalarW, 400*scalarH); }
+    else if (game2Difficulty == 2) { text("hard", 600*scalarW, 400*scalarH); }
+    else if (game2Difficulty == 3) { textSize(45*scalarW); text("extreme", 600*scalarW, 400*scalarH); }
+    textSize(50*scalarW);
+    text(game2Score, 600*scalarW, 500*scalarH);
+    text(game2Score/5, 1150*scalarW, 400*scalarH);
+    text(game2HighScore, 1150*scalarW, 500*scalarH);
 
     textAlign(CENTER);
 
