@@ -42,5 +42,7 @@ function draw() {
     myPageChanger.draw();
     clicked = false;
     typed = [];
+    //console.log(scrolled);
+    scrolled = 0;
 }
 

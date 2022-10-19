@@ -106,7 +106,7 @@ function duckSpawner() {
         }
 
         ducks.push(new duck(
-            duckX, random(400*scalarH, 600*scalarH), duckVector
+            duckX, random(300*scalarH, 450*scalarH), duckVector
         ))
     }
 }

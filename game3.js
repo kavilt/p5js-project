@@ -1,14 +1,14 @@
 
 let controls = [68, 70, 74, 75]; // DF JK by default
 
-let scrollSpeed = 16;
+let scrollSpeed = 18 * scalarH;
 let game3Difficulty = 2; // 0 = easy, 3 = extreme
 let lanes = [];
 let numLanes = controls.length;
-let laneWidth = 80;
-let laneHeight = 600;
-let laneStartY = 50;
-let laneStartX = 700;
+let laneWidth = 100 * scalarW;
+let laneHeight = 650 * scalarH;
+let laneStartY = 20 * scalarH;
+let laneStartX = 700   * scalarW;
 
 let recentHit = 0;
 let timeSinceLastHit = 0;
@@ -42,9 +42,16 @@ lane.prototype.addNote = function() {
 lane.prototype.drawLane = function() {
   // Outline of lane
   noGlow();
-  stroke(0, 0, 0);
+  noStroke();
   fill(color(0, 0, 35, 50));
   rect(this.x, this.y, laneWidth, laneHeight);
+
+  glow(color(0, 0, 0), 32);
+  stroke(color(0, 0, 40));
+  noFill();
+  rect(this.x, this.y, laneWidth, laneHeight);
+
+  noGlow();
 
   stroke(0, 0, 30);
   line(this.x, this.y + this.height - laneWidth, this.x + laneWidth, this.y + this.height - laneWidth);
@@ -52,6 +59,7 @@ lane.prototype.drawLane = function() {
 
   // draw individual notes in lane
   this.drawNotes();
+  fill(0,0,0); // idk, but note highlights breaks without this
 
   // flash lane red if missed
   noGlow();
@@ -59,13 +67,13 @@ lane.prototype.drawLane = function() {
   rect(this.x, this.y, laneWidth, laneHeight);
   noGradient();
   this.missAnimation -= 5;
-  this.hitAnimation -= 5;
+  this.hitAnimation -= 4;
   this.hitColorEnd = [...this.hitColor]; // make a copy without same reference
   this.hitColorEnd[3] = 0;
   this.hitColor[3] = this.hitAnimation;
   
   // small glow when keys are pressed
-  gradient(color(this.hitColor), color(this.hitColorEnd), this.x + laneWidth/2, this.y + laneHeight, this.x + laneWidth/2, this.y + laneHeight - laneHeight/2);
+  gradient(color(this.hitColor), color(this.hitColorEnd), this.x + laneWidth/2, this.y + laneHeight, this.x + laneWidth/2, this.y + laneHeight - laneHeight/2 - this.hitAnimation);
   rect(this.x, this.y, laneWidth, laneHeight);
   noGradient();
 }
@@ -178,7 +186,7 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
 
   // spawn notes
   if (frameCount % 12 == 0) {
-    let tempLane = round(random(0.7, 2.2));
+    let tempLane = round(random(1.5, 2.4));
     let laneSpawns = [];
     for (let i = 0; i < tempLane; i ++) {
       laneSpawns[round(random(0, numLanes-1))] = true;
@@ -213,12 +221,20 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
 }
 
 
+
 /** User can:
  * choose song using scroll list (right side)
  * choose from 4 different difficulties for each song (Left side)
  */
-function drawGame3SongSelect() {
 
+
+function drawGame3SongSelect() {
+  myScrollList.draw();
+
+  backButton.drawBack();
+  if (backButton.clicked) {
+    myPageChanger.change(1);
+  }
 }
 
 
