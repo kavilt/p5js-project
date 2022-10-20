@@ -1,6 +1,7 @@
 
 
 function draw() {
+    frameRate(60);
     cursor(ARROW);
   
     drawBackground();
@@ -36,12 +37,12 @@ function draw() {
         drawGame3SongSelect();
     }
 
-
     resetMatrix();
     myPageChanger.update(); // handles page transitions
     myPageChanger.draw();
     clicked = false;
     typed = [];
+    typeTap = [];
     //console.log(scrolled);
     scrolled = 0;
 }

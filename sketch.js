@@ -2,6 +2,7 @@
 // Declare Variables
 let page = 5.1; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 let keys = [];
+let typeTap = [];
 let typed = [];
 let clicked = false;
 let scrolled = 0;
@@ -13,11 +14,14 @@ let myScrollList;
 // Declare sound variables
 let buttonClickSound;
 let buttonHoverSound;
+let songs = [];
 
 // Declare image files
 let title;
 let heart;
+let playButton;
 let thumbnails = []; // game3 song covers
+let previews = [];
 
 // Preload sound and image files
 
@@ -25,8 +29,12 @@ function preload() {
   buttonClickSound = new Howl({src: "assets/menuclick.ogg"});
   buttonHoverSound = new Howl({src: "assets/button hover.ogg"})
 
+  songs[0] = new Howl({src: "assets/songs/brain power.mp3", html5: true, volume: 0.5});
+  songs[1] = new Howl({src: "assets/songs/meAndU.mp3", html5: true, volume: 0.5});
+
   title = loadImage('assets/placeholder.png');
   heart = loadImage('assets/heart.png');
+  playButton = loadImage('assets/playbutton.png');
 
 }
 
@@ -35,37 +43,40 @@ function setup() {
   colorMode(HSB, 360, 100, 100, 100);
   textAlign(CENTER, CENTER);
   angleMode(DEGREES);
-  console.log("initialized");
   canvas2 = createGraphics(400, 400);
-  myScrollList = new scrollList(175*scalarW, 90*scalarH, 500*scalarW, 600*scalarH, 130);
+  myScrollList = new scrollList(175*scalarW, 90*scalarH, 600*scalarW, 575*scalarH, 130);
   canvas2.textAlign(CENTER, CENTER);
   addSongs();
+  playButton.resize(45*scalarW, 0);
+
+
 }
 
 function addSongs() {
-  console.log("SONGS ADDED");
   thumbnails[0] = loadImage('assets/thumbnails/BRAIN POWER.png');
-  resizeImages();
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
-  myScrollList.addItem("hey", 300, 200, "wow", thumbnails[0]);
+  thumbnails[1] = loadImage('assets/thumbnails/succducc.jpg', resizeThumbnails)
+  previews[0] = loadImage('assets/thumbnails/BRAIN POWER.png');
+  previews[1] = loadImage('assets/thumbnails/succducc.jpg', resizePreviews)
+  for (let i = 0; i < 100; i ++) {
+    if(3 < i < 4){
+      myScrollList.addItem("me & u", "succducc", 160, 192, songs[1], 94, thumbnails[1], previews[1]); // BRAIN  POWERRRRR
+    }
+    myScrollList.addItem("Brain Power", "NOMA", 170, 110, songs[0], 70, thumbnails[0], previews[0]); // BRAIN  POWERRRRR
+  }
+
+  
+  
 }
 
-function resizeImages() {
+function resizeThumbnails() {
   for (let i = 0; i < thumbnails.length; i ++) {
-    thumbnails[i].resize(30, 0);
-    console.log(thumbnails[i].width);
+    thumbnails[i].resize(80*scalarW, 0);
+  }
+}
+
+function resizePreviews() {
+  for (let i = 0; i < previews.length; i ++) {
+    previews[i].resize(505*scalarW, 0); // fill the remaining space on the right side of screen
   }
 }
 
@@ -75,6 +86,7 @@ function pageChanger() { // handles the transitions between pages (fade to black
   this.targetPage = null;
   this.transitionPercent = 0; // value between 0-1, 0=start of transition, 1=peak of transition (black)
   this.transitionPercentExponential = 0;
+  this.callback = null;
 
   this.update = function() { // update alpha values
     this.transitionPercent = map(constrain(this.alpha, 0, 100), 0, 100, 1, 0);
@@ -83,7 +95,12 @@ function pageChanger() { // handles the transitions between pages (fade to black
       this.alpha -= 4;
       if (this.alpha < 0) {
         this.decreasing = false;
-        if (this.targetPage != null) {page = this.targetPage; }
+        if (this.targetPage != null) {
+          page = this.targetPage; 
+          if (this.callback != null) {
+            this.callback();
+          }
+        }
       }
     } else {
       this.alpha += 6;
@@ -97,10 +114,11 @@ function pageChanger() { // handles the transitions between pages (fade to black
     rect(0, 0, width, height);
   }
 
-  this.change = function(targetPage) { // cue a transition
+  this.change = function(targetPage, callback) { // cue a transition
     this.alpha = 100;
     this.decreasing = true;
     this.targetPage = targetPage;
+    this.callback = callback;
   }
 }
 var myPageChanger = new pageChanger();
@@ -114,12 +132,13 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   this.border = thickness; 
   this.roundness = roundness;
   this.solid = solid;
-  this.clr;
 
   this.heldDown = false;
   this.clicked = false;
   this.expansion = 1;
   this.mouseInTime = 0;
+
+  this.flicker = 0;
 
   this.update = function() {
     this.clicked = false;
@@ -154,18 +173,25 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
       this.expansion += (1-this.expansion)/6; // quickly shrink to 1x size
       this.mouseInTime = 0;
     }
+
+    this.flicker/=2;
+    if (random(0, 1) > 0.8 && this.flicker < 1) {
+      this.flicker = random(5, 10);
+      if (random(0, 1) > 0.98) {
+        this.flicker = random(50, 70);
+      }
+    }
   }
 }
 
 button.prototype.drawBorder = function(){ // all buttons inherit this border
-  if(this.clr == undefined) {this.clr = color(207, 7, 100);}
   this.update();
   translate(this.x + this.width/2, this.y + this.height/2);
   scale(this.expansion);
   rotate((this.expansion-1)*7)
-  glow(color(this.clr), 35);
+  glow(color(207, 7, 100, 100-this.flicker), 35);
   strokeWeight(this.border);
-  stroke(color(this.clr));
+  stroke(207, 7, 100, 100-this.flicker);
   if(this.solid) {
      fill(99 + (this.expansion-1)*70); // brighten when hovered over
   } else {
@@ -235,7 +261,7 @@ button.prototype.drawBack = function() {
 // main menu (page = 0)
 let startButton = new button(w/2-(140*scalarW), 320*scalarH, 280*scalarW, 100*scalarW, 8, 10);
 let scoresButton = new button(w/2-(140*scalarW), 520*scalarH, 280*scalarW, 100*scalarW, 8, 10);
-let backButton = new button(30, h-30-60, 150, 60, 10, 10);
+let backButton = new button(18*scalarW, h-30*scalarH-60, 150*scalarW, 60*scalarH, 10, 10);
 function drawMenu() {
   startButton.buttonWithText("start", 60*scalarH);
   scoresButton.buttonWithText("view scores", 40*scalarH);
@@ -297,7 +323,7 @@ function drawSelect() {
     myPageChanger.change(4.1);
   }
   else if (game3Button.clicked) {
-    myPageChanger.change(5.1);
+    myPageChanger.change(5.1, initSongSelect);
   }
 
 }
@@ -417,34 +443,40 @@ function scrollList(x, y, w, h, thickness) {
   this.y = y;
   this.w = w;
   this.h = h;
-  this.offset = 20; // grow the margins of the scrollList by this amount, so glow effects will bleed out onto main canvas
+  this.offset = 5; // grow the margins of the scrollList by this amount, so glow effects will bleed out onto main canvas
   this.thickness = thickness; // height of each element in the list
-  this.scrollElement = function(name, bpm, duration, song, img) {
+  this.scrollElement = function(name, artist, bpm, duration, song, prev, img, imgLarge) {
     this.name = name;
+    this.artist = artist;
     this.bpm = bpm;
     this.duration = duration;
     this.song = song;
     this.img = img;
+    this.imgLarge = imgLarge;
     this.height = thickness;
-    this.update = function() {
-      this.height += (thickness-this.height) / 5; // shrink if height is larger than normal height
-    }
+    this.targetHeight = this.height + 50;
+    this.animationPercent = 0;
+    this.preview = prev;
   }
   this.scrollElements = [];
 
-  this.position = 0;
+  this.position = 50;
   this.v = 0; // scroll velocity
   this.selected = 0; // current item index which is selected
   this.snapping = false; // if true, scrolling from current position -> position of selected
   this.dragging = false;
   this.distMoved = 0;
+  this.playing = 0;
   canvas2.resizeCanvas(this.w+this.offset*2, this.h+this.offset*2);
   canvas2.colorMode(HSB, 360, 100, 100, 100);
 }
 
-scrollList.prototype.addItem = function(name, bpm, duration, song) {
-  this.scrollElements.push(new this.scrollElement(name, bpm, duration, song));
+scrollList.prototype.addItem = function(name, artist, bpm, duration, song, preview, img, largeImg) {
+  this.scrollElements.push(new this.scrollElement(name, artist, bpm, duration, song, preview, img, largeImg));
 }
+
+let animationPercent = 0;
+let selectedPos = 0;
 
 scrollList.prototype.draw = function() {
   canvas2.clear();
@@ -453,65 +485,138 @@ scrollList.prototype.draw = function() {
 
   // for i in songs, if scroll position is close to index, draw
   let pos = 0; // secondary counter that keeps track of actual position
-  let selectedPos = 0;
   let mouseIsOver = null; // keep track of which list item the user is hovering over
+  animationPercent += (1-animationPercent)/5;
+
+  // draw buffer item before the 0th item
+  canvas2.fill(260, 10, 70, 50);
+  canvas2.noStroke();
+  canvas2.rect(0, -200, this.w, 200);
 
   // where most of the drawing happens
   for (let i = 0; i < this.scrollElements.length; i ++) {
-    this.scrollElements[i].update(); // update each list element
-    if (1 == 1) { // Item is on screen (or almost), so draw it
+    let item = this.scrollElements[i];
+    item.animationPercent = map(item.targetHeight - item.height, 0, 50, 1, 0);
+    if (-this.position < pos + 200*scalarH && -this.position + this.h > pos - 200*scalarH) { // Item is on screen (or almost), so draw it
 
       // mouse over detection
-      if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y + pos + this.position && mouseY < this.y + pos + this.scrollElements[i].height + this.position) {
+      if (mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y + pos + this.position && mouseY < this.y + pos + item.height + this.position) {
         mouseIsOver = i;
         if (clicked && !this.dragging) { // if the user is scrolling by dragging, releasing mouse shouldnt select item
-          this.selected = mouseIsOver;
-
-          // is the selected item outside of the scroll panel? If so, change update position so it appears again
+          if (this.selected != mouseIsOver) {
+            frameCount = 0;
+            animationPercent = 0;
+            this.scrollElements[this.selected].song.stop();
+            this.selected = mouseIsOver;
+            item.song.seek(item.preview);
+            item.song.fade(0, 0.5, 600);
+            item.song.play();
+            this.playing = i;
+            // is the selected item outside of the scroll panel? If so, change update position so it appears again
+  
+            if(this.checkVisible() != 0) {this.jump(); }
+  
+            buttonClickSound.play();
+          }
         }
       }
-
+      
       canvas2.fill(260, 10, 70, 50);
       canvas2.stroke(0, 0, 20, 50);
       if (this.selected == i) { // if the song is selected, it grows slightly taller
         // grow the element up!
-        this.scrollElements[i].height += (this.thickness+200 - this.scrollElements[i].height)/20;
-        canvas2.rect(0, pos, this.w, this.scrollElements[i].height);
+        item.height += (item.targetHeight - item.height)/7;
+        canvas2.rect(0, pos, this.w, item.height);
         selectedPos = pos;
-
+        
       } else { // song isnt selected (normal list item)
+        item.height += (this.thickness - item.height) / 5;
         canvas2.noStroke();
         canvas2.strokeWeight(2);
-        canvas2.rect(0, pos, this.w, this.scrollElements[i].height);
-
+        canvas2.rect(0, pos, this.w, item.height);
+        
         // draw divider between songs
         canvas2.stroke(270, 7, 55);
         canvas2.line(20, pos, this.w-20, pos);
       }
-
+      
       // draw the UI elements on each tile
       // the left circle 
       canvas2.noStroke();
       canvas2.fill(273, 50, 30);
-      canvas2.circle(this.scrollElements[i].height/2, pos + this.scrollElements[i].height/2, 40 + this.scrollElements[i].height/10);
-
+      canvas2.circle(20 * scalarW + item.height/4.5, pos + item.height/2, 40 + item.height/10);
+      
       // and the number inside it
       canvas2.textFont("monospace");
-      canvas2.textSize(30*scalarW);
-
+      canvas2.textSize(35*scalarW);
+      
       canvas2.drawingContext.shadowBlur=32;
       canvas2.drawingContext.shadowColor=color(170, 100, 85);
       canvas2.fill(170, 100, 85);
-      canvas2.text(i, this.scrollElements[i].height/2, pos + this.scrollElements[i].height/2 + 2);
+      canvas2.text(i+1, 20 * scalarW + item.height/4.5, pos + item.height/2+2); // 20*scalarW + item.height/4.5
       canvas2.drawingContext.shadowColor = null;
       canvas2.drawingContext.shadowBlur = 0;
-
+      
       // place the image to the right
-      canvas2.image(thumbnails[0], this.scrollElements[i].height/2 + 50*scalarW, pos + this.scrollElements[i].height/2);
+      canvas2.push();
+      canvas2.resetMatrix();
+      canvas2.translate(item.height/2 + 70*scalarW + this.offset, this.position+this.offset + pos + item.height/2);
+      canvas2.scale(0.9 + 0.3*item.animationPercent + item.animationPercent * 0.03 * sin(frameCount*3));
+      // draw small shadow under object
+      canvas2.drawingContext.shadowBlur = 20 + 30*item.animationPercent;
+      canvas2.drawingContext.shadowColor=color(0, 0, 0, 40 + 20*item.animationPercent);
+      canvas2.noStroke();
+      canvas2.rect(-item.img.width/2+2, -item.img.height/2+2, item.img.width-4, item.img.height-4);
+      canvas2.drawingContext.shadowBlur = 0;
+      canvas2.drawingContext.shadowColor=null;
+      
+      canvas2.image(item.img, -item.img.width/2, -item.img.height/2);
+      canvas2.pop();
+      
+      // draw playing icon if selected
+      if (this.selected == i) {
+        canvas2.fill(0, 0, 100);
+        canvas2.noStroke();
+        canvas2.drawingContext.shadowBlur = 40;
+        canvas2.drawingContext.shadowColor=color(0, 0, 100, 100);
+        canvas2.tint(100, animationPercent*100);
+        canvas2.image(playButton, item.height/2 - thumbnails[0].width/2 + 70*scalarW + 17.5*scalarW, pos - playButton.height/2 + item.height/2);
+        canvas2.drawingContext.shadowBlur = 0;
+        canvas2.drawingContext.shadowColor=null; 
+        canvas2.tint(100, 100);
+      }
+
+      // Song title
+      canvas2.drawingContext.shadowBlur = 40;
+      canvas2.drawingContext.shadowColor=color(0, 0, 0, 60);
+      canvas2.fill(0, 0, 80 + item.animationPercent*30);
+      //canvas2.textSize(35 + (this.selected == i ? 15*animationPercent : 0));
+      canvas2.textSize(35 + item.animationPercent*15);
+      //console.log(item.animationPercent);
+      canvas2.textAlign(LEFT, CENTER);
+      canvas2.text(item.name, item.height/2 + 130*scalarW, pos + item.height/2 - item.height*0.1*item.animationPercent);
+      
+      // artist / song information, only if selected
+      if (this.selected == i) {
+        canvas2.fill(0, 0, 90, 90*item.animationPercent)
+        //canvas2.textSize(30 * item.animationPercent);
+        canvas2.textSize(30);
+        canvas2.text("by " + item.artist + "   bpm: " + item.bpm, item.height/2 + 130*scalarW, pos + item.height/2 + item.height*0.12*item.animationPercent);
+      }
+      canvas2.drawingContext.shadowBlur = 0;
+      canvas2.drawingContext.shadowColor=null; 
+      canvas2.textAlign(CENTER, CENTER);
 
     }
-    pos += this.scrollElements[i].height;
+    pos += item.height;
   }
+
+  // draw buffer item before the last item
+  canvas2.fill(260, 10, 70, 50);
+  canvas2.stroke(270, 7, 55);
+  canvas2.line(20, pos, this.w-20, pos);
+  canvas2.noStroke();
+  canvas2.rect(0, pos, this.w, 200);
 
   // small glow aura around selected
   canvas2.noFill();
@@ -524,16 +629,40 @@ scrollList.prototype.draw = function() {
   canvas2.drawingContext.shadowColor = null;
   canvas2.drawingContext.shadowBlur = 0;
 
-  if (typed[40]) {
+  if (typeTap[40]) {
     this.selected += 1;
+    this.selected = constrain(this.selected, 0, this.scrollElements.length-1);
+    if (this.playing != this.selected) {
+      if (this.checkVisible() != 0) { this.jump(); }
+      frameCount = 0;
+      buttonClickSound.play();
+      animationPercent = 0;
+      this.scrollElements[this.selected-1].song.stop();
+      this.scrollElements[this.selected].song.seek(this.scrollElements[this.selected].preview);
+      this.scrollElements[this.selected].song.fade(0, 0.5, 600);
+      this.scrollElements[this.selected].song.play();
+      this.playing = this.selected;
+    }
   }
 
-  if (typed[38]) {
+  if (typeTap[38]) {
     this.selected -= 1;
+    this.selected = constrain(this.selected, 0, this.scrollElements.length-1);
+    if (this.playing != this.selected) {
+      if (this.checkVisible() != 0) { this.jump(); }
+      frameCount = 0;
+      buttonClickSound.play();
+      animationPercent = 0;
+      this.scrollElements[this.selected+1].song.stop();
+      this.scrollElements[this.selected].song.seek(this.scrollElements[this.selected].preview);
+      this.scrollElements[this.selected].song.fade(0, 0.5, 600);
+      this.scrollElements[this.selected].song.play();
+      this.playing = this.selected;
+    }
   }
 
   //constrain scroll position
-  this.position = constrain(this.position, -pos + this.h, 0);
+  this.position = constrain(this.position, -pos + this.h - 20*scalarH, 20*scalarH);
 
   // update list scroll position
   // user is dragging
@@ -555,12 +684,42 @@ scrollList.prototype.draw = function() {
   let sign = Math.sign(scrolled);
   this.v -= Math.pow((Math.abs(scrolled)),0.7) * sign;
 
+  if (this.snapping) {
+    let snapDistance = this.checkVisible();
+    if (Math.abs(snapDistance) > 500) {
+      this.v = (-this.position - this.thickness/2 - this.selected*this.thickness + this.h/2) / 20;
+    }
+    else if (snapDistance > 0) {
+      this.v += 5;
+    }
+    else {
+      this.v += -5;
+    }
+    if (this.checkVisible() == 0) { this.snapping = false;} 
+  }
 
   canvas2.resetMatrix();
 
   image(canvas2, this.x-this.offset, this.y-this.offset);
 }
 
+scrollList.prototype.checkVisible = function() { // false if selected item is currently outside of list window
+  if (this.selected*this.thickness > -this.position  && this.selected*this.thickness < -this.position + this.h - this.thickness) {
+    return 0; // fully visible
+  }
+  else{  // not visible
+    return -this.position - this.thickness/2 - this.selected*this.thickness + this.h/2
+  }
+}
+
+scrollList.prototype.jump = function() {
+  this.snapping = true;
+}
+
+scrollList.prototype.stopPreview = function() {
+  this.scrollElements[this.playing].song.fade(0.5, 0, 1000);
+  console.log("STOPPED");
+}
 
 function mouseClicked() {
   clicked = true; // true only for one frame when the user releases the mouse
@@ -576,7 +735,7 @@ function touchEnded() { // for mobile
 
 function keyPressed() {
   keys[keyCode] = true;
-  typed[keyCode] = true;
+  typeTap[keyCode] = true;
 }
 
 function keyReleased() {

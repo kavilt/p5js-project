@@ -89,7 +89,7 @@ lane.prototype.update = function() {
   // on keyboard:
 
   // if the key corresponding to the lane was pressed:
-  if (typed[controls[this.ind]]) {
+  if (typeTap[controls[this.ind]]) {
     this.hitColor = [0, 0, 100, 100]; // if the user hit literally nothing
     this.hitAnimation = 70;
     buttonClickSound.stop();
@@ -211,7 +211,6 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
   fill(0, 0, 100, 70-timeSinceLastHit*5);
   text(recentHit, laneStartX + (numLanes/2) * laneWidth, 300);
 
-
   backButton.drawBack();
   if(backButton.clicked) {
     myPageChanger.change(1);
@@ -227,14 +226,67 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
  * choose from 4 different difficulties for each song (Left side)
  */
 
-
+function initSongSelect() {
+  myScrollList.jump();
+}
 function drawGame3SongSelect() {
-  myScrollList.draw();
+  
 
   backButton.drawBack();
   if (backButton.clicked) {
     myPageChanger.change(1);
+    myScrollList.stopPreview();
   }
+  
+  // big background behind preview image
+  // glow(color(330, 30, 100), 32);
+  //fill(330, 20, 100);
+  fill(230, 15, 80, 100);
+  rect(775*scalarW, 0, 505*scalarW, h);
+  //noGlow();
+  
+  // big image preview on very right
+  glow(color(0, 0, 0, 30), 50);
+  let previewImage = myScrollList.scrollElements[myScrollList.selected].imgLarge;
+  image(previewImage, 775*scalarW, 100*scalarH);
+  // lines above and below
+  stroke(0, 0, 40);
+  strokeWeight(3);
+  line(775*scalarW, 100*scalarH, w, 100*scalarH);
+  line(775*scalarW, 100*scalarH + previewImage.height, w, 100*scalarH + previewImage.height);
+  noGlow();
+  
+  myScrollList.draw();
+  
+  // top bar above scroll menu
+  noStroke();
+  fill(230, 15, 80, 100);
+  glow(color(0, 0, 0, 20), 52);
+  rect(175*scalarW, 0, 600+1000*scalarW, 99*scalarH);
+  noGlow();
+
+  // song select sideways text
+  push();
+  textFont("Consolas");
+  textSize(120);
+  fill(0, 0, 100);
+  translate(w*0.075, h*0.6);
+  rotate(-90);
+  text("song", -50, -10);
+  fill(170, 20, 100);
+  textSize(80);
+  text("select", 220, 0);
+  pop();
+
+  // big white separator between left and scrollList
+  strokeWeight(10);
+  stroke(0, 0, 100);
+  line(175*scalarW, 0, 175*scalarW, h);
+
+  // bottom white bar
+  noStroke();
+  fill(0, 0, 100);
+  rect(175*scalarW, h*0.93, w, h*0.07);
 }
 
 
