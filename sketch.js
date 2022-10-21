@@ -10,6 +10,12 @@ let scalarW = (w/1280);
 let scalarH = (h/720);
 let canvas2;
 let myScrollList;
+let musicVolume = 0.1;
+
+// beat timing management
+let timeSinceNewSong = 0;
+let msPerBeat = 0;
+let timeOfNextBeat = 0;
 
 // Declare sound variables
 let buttonClickSound;
@@ -29,8 +35,8 @@ function preload() {
   buttonClickSound = new Howl({src: "assets/menuclick.ogg"});
   buttonHoverSound = new Howl({src: "assets/button hover.ogg"})
 
-  songs[0] = new Howl({src: "assets/songs/brain power.mp3", html5: true, volume: 0.5});
-  songs[1] = new Howl({src: "assets/songs/meAndU.mp3", html5: true, volume: 0.5});
+  songs[0] = new Howl({src: "assets/songs/brain power.mp3", html5: true, volume: 0.1});
+  songs[1] = new Howl({src: "assets/songs/meAndU.mp3", html5: true, volume: 0.1});
 
   title = loadImage('assets/placeholder.png');
   heart = loadImage('assets/heart.png');
@@ -61,7 +67,7 @@ function addSongs() {
     if(3 < i < 4){
       myScrollList.addItem("me & u", "succducc", 160, 192, songs[1], 94, thumbnails[1], previews[1]); // BRAIN  POWERRRRR
     }
-    myScrollList.addItem("Brain Power", "NOMA", 170, 110, songs[0], 70, thumbnails[0], previews[0]); // BRAIN  POWERRRRR
+    myScrollList.addItem("Brain Power", "NOMA", 173, 110, songs[0], 70, thumbnails[0], previews[0]); // BRAIN  POWERRRRR
   }
 
   
@@ -438,6 +444,8 @@ camera.prototype.shake = function(vx, vy) {
 
 myCam = new camera();
 
+let time = 0;
+
 function scrollList(x, y, w, h, thickness) {
   this.x = x;
   this.y = y;
@@ -508,8 +516,10 @@ scrollList.prototype.draw = function() {
             animationPercent = 0;
             this.scrollElements[this.selected].song.stop();
             this.selected = mouseIsOver;
+            time = millis();
+            timeOfNextBeat = (1000*60 / item.bpm) - (item.preview * 1000) % (1000 * 60 / item.bpm);
             item.song.seek(item.preview);
-            item.song.fade(0, 0.5, 600);
+            item.song.fade(0, musicVolume, 600);
             item.song.play();
             this.playing = i;
             // is the selected item outside of the scroll panel? If so, change update position so it appears again
@@ -637,9 +647,11 @@ scrollList.prototype.draw = function() {
       frameCount = 0;
       buttonClickSound.play();
       animationPercent = 0;
+      time = millis();
+      timeOfNextBeat = (1000*60 / this.scrollElements[this.selected].bpm) - (this.scrollElements[this.selected].preview * 1000) % (1000 * 60 / this.scrollElements[this.selected].bpm);
       this.scrollElements[this.selected-1].song.stop();
       this.scrollElements[this.selected].song.seek(this.scrollElements[this.selected].preview);
-      this.scrollElements[this.selected].song.fade(0, 0.5, 600);
+      this.scrollElements[this.selected].song.fade(0, musicVolume, 600);
       this.scrollElements[this.selected].song.play();
       this.playing = this.selected;
     }
@@ -651,11 +663,13 @@ scrollList.prototype.draw = function() {
     if (this.playing != this.selected) {
       if (this.checkVisible() != 0) { this.jump(); }
       frameCount = 0;
+      time = millis();
+      timeOfNextBeat = (1000*60 / this.scrollElements[this.selected].bpm) - (this.scrollElements[this.selected].preview * 1000) % (1000 * 60 / this.scrollElements[this.selected].bpm);
       buttonClickSound.play();
       animationPercent = 0;
       this.scrollElements[this.selected+1].song.stop();
       this.scrollElements[this.selected].song.seek(this.scrollElements[this.selected].preview);
-      this.scrollElements[this.selected].song.fade(0, 0.5, 600);
+      this.scrollElements[this.selected].song.fade(0, musicVolume, 600);
       this.scrollElements[this.selected].song.play();
       this.playing = this.selected;
     }

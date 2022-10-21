@@ -228,9 +228,33 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
 
 function initSongSelect() {
   myScrollList.jump();
+
+  // start playing selected song
+
+  let item = myScrollList.scrollElements[myScrollList.selected];
+  time = millis();
+  timeOfNextBeat = (1000*60 / item.bpm) - (item.preview * 1000) % (1000 * 60 / item.bpm);
+  item.song.seek(item.preview);
+  item.song.fade(0, musicVolume, 600);
+  item.song.play();
 }
+
+let flashAlpha = 0;
 function drawGame3SongSelect() {
-  
+  timeSinceNewSong = millis() - time;
+  msPerBeat = 60 * 1000 / myScrollList.scrollElements[myScrollList.selected].bpm;
+  fill(0, 0, 100, flashAlpha/4);
+  rect(0, 0, w, h);
+  //text(round(timeSinceNewSong)+"ms, " + round(timeOfNextBeat), 40, 20);
+  // 
+  if (timeSinceNewSong > timeOfNextBeat) {
+    timeOfNextBeat += msPerBeat;
+    flashAlpha = 30;
+    buttonClickSound.volume(1);
+    buttonClickSound.play();
+  }
+
+  flashAlpha -= 2;
 
   backButton.drawBack();
   if (backButton.clicked) {
