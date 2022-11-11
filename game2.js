@@ -33,9 +33,16 @@ duck.prototype.update = function() {
     this.x += this.v.x; 
     this.y += this.v.y;
 
-    if (dist(640, 360, this.x, this.y) > 800) { // duck is off screen
+    if (dist(640, 360, this.x, this.y) > 800) { // duck is off screen, player missed
         if (this.alive) {
             game2Lives --;
+            missSound.stop();
+            missSound.volume(1);
+            missSound.play();
+            missSound.fade(1, 0, 700);
+            let v = p5.Vector.fromAngle(random(180, 360), 10);
+            myCam.mode = 1;
+            myCam.shake(v.x, v.y);
         }
         this.alive = false;
     }
@@ -187,10 +194,14 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
     if(backButton.clicked) {
         myPageChanger.change(4.1);
     } 
-    else if (clicked && fireAnimation < 10) { // if click, start animating recoil 
+    else if (clicked && fireAnimation < 10) { // if click, start animating recoil and play shoot sound
         fireAnimationIncreasing = true;
         let v = p5.Vector.fromAngle(random(180, 360), 12);
+        myCam.mode = 0;
         myCam.shake(v.x, v.y);
+        shootSound.play();
+        shootSound.volume(0.2);
+        shootSound.fade(0.2, 0, 1000);
     }
     // do duck stuff
     myDuckSpawner.attemptSpawn();
@@ -217,6 +228,7 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
     if (game2Lives == 0) {
         game2Lives = -1;
         myPageChanger.change(4.2);
+        loseSound.play();
     }
 }
 
