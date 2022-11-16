@@ -1,4 +1,6 @@
 let game1Difficulty = 1; // sets type of maze
+let ready =0;
+
 
 function drawGame1() { //  maze game,  pages 3-3.9
   backButton.drawBack();
@@ -51,11 +53,15 @@ function drawGame1DifficultySelect() {
 }
 
 function drawMaze(){
+  backButton.drawBack();
+  if(backButton.clicked) {
+    myPageChanger.change(3);
+  } 
   fill(255,0,255);
   rect(350,0,30,520);
   rect(350,570,30,50);
   rect(1000, 620, 30, -570);
-  if(game1Difficulty == 0){
+  if(game1Difficulty == 3){
     rect(430, 570, 30, -520);
     rect(430, 50, 100, 30);
     rect(580, 000, 30, 130);
@@ -68,8 +74,429 @@ function drawMaze(){
     rect(670, 290, 30, -250);
     rect(670, 490,30, -150);
     rect(590, 220, 80, 30);
-    rect(750, 460, 200, 30);
-    rect()
+    rect(750, 460, 250, 30);
+    rect(670, 100, 350, 30);
+    rect(750, 0, 30, 50);
+    rect(670, 290, 200, -30);
+    rect(820, 130, 30, -100);
+    rect(670, 360, 200, -30);
+    rect(750, 180, 260, 30);
+    rect(910, 180, 30, 220);
+    rect(750, 400, 190, 30);
+    rect(900, 0, 30, 50);
+    ready = 1;
+  }
+  if(game1Difficulty == 1){
+    circle(580, 250, 50);
+    circle(480, 300, 100);
+    circle(640, 100, 75);
+    circle(480, 360, 90);
+    circle(675, 75, 150);
+    circle(500, 50, 50);
+    circle(590, 385, 65);
+    circle(480, 420, 50);
+    circle(750, 560, 100);
+    circle(900, 100, 100);
+    circle(850, 460, 200);
+    circle(775, 245, 70);
+    circle(850, 250, 100);
+    circle(450, 200, 85);
+    circle(500, 430, 60);
+    circle(600, 550, 100);
+    circle(700, 350, 100);
+    circle(960, 180, 50);
+    circle(470, 550, 75);
+    circle(680, 250, 80);
+    circle(550, 150, 60);
+    circle(800, 155, 60);
+    circle(950, 300, 75);
+    ready = 2;
+  }
+  if(game1Difficulty == 0){
+    triangle(500,450, 550,200, 600, 500);
+    triangle(480,60, 580, 200, 650, 125);
+    triangle(390, 0, 600, 50, 750, 25 );
+    triangle(980, 60, 750, 55, 800, 100);
+    triangle(880, 450, 925, 580, 800, 360);
+    triangle(790, 0, 850, 30, 990, 25);
+    triangle(600, 250, 640, 200, 700, 390);
+    triangle(390, 200, 425, 185, 435, 300);
+    triangle(680, 580, 620, 480, 700, 420);
+    triangle(390, 490, 420, 525, 450, 575);
+    triangle(480, 500, 550, 560, 600, 580);
+    triangle(750, 250, 825, 335, 900, 180);
+    triangle(980, 200, 850, 350, 900, 400);
+    triangle(725, 450, 800, 425, 780, 590);
+    triangle(675, 150, 800, 120, 725, 250);
+    triangle(400, 80, 450, 110, 415, 150);
+    triangle(470, 170, 495, 300, 480, 390);
+    ready = 3;
+  }
+  playGame1();
+}
+function playGame1(){
+  if(ready == 1) {
+    strokeWeight(35);
+    stroke('orange');
+    line(mouseX, mouseY, pmouseX, pmouseY);
+    if(MouseRect(430, 50, 30, 520)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(430, 50, 100, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(580, 000, 30, 130)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(520, 130, 90, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(430, 540, 520, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(510, 130, 30, 150)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(510, 280, 30, 130)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(430, 460, 240, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(590, 220, 30, 190)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(670, 50, 30, 250)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(670, 340,30, 150)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(590, 220, 80, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(750, 460, 250, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(670, 100, 350, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(750, 0, 30, 50)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(670, 260, 200, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(820, 30, 30, 100)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(670, 330, 200, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(750, 180, 260, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(910, 180, 30, 220)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(750, 400, 190, 30)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    if(MouseRect(900, 0, 30, 50)){
+      fill('red');
+      rect(500, 50, 50);
+    }
+    
+  }
+  if(ready == 2){
+    strokeWeight(30);
+    stroke('orange');
+    line(mouseX, mouseY, pmouseX, pmouseY);
+    if(MouseCic(580, 250, 50)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(480, 300, 100)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(640, 100, 75)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(480, 360, 90)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(675, 75, 150)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(500, 50, 50)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(590, 385, 65)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(480, 420, 50)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(750, 560, 100)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(900, 100, 100)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(850, 460, 200)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(775, 245, 70)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(850, 250, 100)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(450, 200, 85)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(500, 430, 60)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(600, 550, 100)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(700, 350, 100)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(960, 180, 50)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(470, 550, 75)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(680, 250, 80)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(550, 150, 60)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(800, 155, 60)){
+      fill('red');
+      rect(100,50,50,50);
+    }
+    if(MouseCic(950, 300, 75)){
+      fill('red');
+      rect(100,50,50,50);
+    }
 
   }
+
+  if(ready == 3){
+    strokeWeight(20);
+    stroke('orange');
+    line(mouseX, mouseY, pmouseX, pmouseY);
+  if(MouseTriangle(500,450, 550,200, 600, 500)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(480,60, 580, 200, 650, 125)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(390, 0, 600, 50, 750, 25)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(980, 60, 750, 55, 800, 100)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(880, 450, 925, 580, 800, 360)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(790, 0, 850, 30, 990, 25)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(600, 250, 640, 200, 700, 390)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(390, 200, 425, 185, 435, 300)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(680, 580, 620, 480, 700, 420)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(390, 490, 420, 525, 450, 575)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(480, 500, 550, 560, 600, 580)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(750, 250, 825, 335, 900, 180)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(980, 200, 850, 350, 900, 400)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(725, 450, 800, 425, 780, 590)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(675, 150, 800, 120, 725, 250)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(400, 80, 450, 110, 415, 150)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+  if(MouseTriangle(470, 170, 495, 300, 480, 390)){
+    fill('red');
+    rect(100,50,50,50);
+  }
+}
+
+if(MouseRect(350,0,30,520) || MouseRect(350,570,30,50)|| MouseRect(1000, 50, 30, 570)){
+  fill('red');
+  rect(100,50,50,50);
+}
+}
+function TriArea(a, b, c) {
+    return abs((a[0]*(b[1]-c[1]) + b[0]*(c[1]-a[1])+ c[0]*(a[1]-b[1]))/2);
+}
+
+function MouseTriangle(x1, y1, x2, y2, x3, y3){
+    let point = [mouseX - sqrt(10), mouseY - 10];
+    let area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    let areaA = TriArea([x1, y1], [x2, y2], point);
+    let areaB = TriArea(point, [x2, y2], [x3, y3]);
+    let areaC = TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    point = [mouseX + sqrt(10), mouseY - 10];
+    area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    areaA = TriArea([x1, y1], [x2, y2], point);
+    areaB = TriArea(point, [x2, y2], [x3, y3]);
+    areaC= TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    point = [mouseX + sqrt(10), mouseY + 10];
+    area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    areaA = TriArea([x1, y1], [x2, y2], point);
+    areaB = TriArea(point, [x2, y2], [x3, y3]);
+    areaC= TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    point = [mouseX - sqrt(10), mouseY + 10];
+    area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    areaA = TriArea([x1, y1], [x2, y2], point);
+    areaB = TriArea(point, [x2, y2], [x3, y3]);
+    areaC= TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    point = [mouseX - 10, mouseY + sqrt(10)];
+    area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    areaA = TriArea([x1, y1], [x2, y2], point);
+    areaB = TriArea(point, [x2, y2], [x3, y3]);
+    areaC= TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    point = [mouseX - 10, mouseY - sqrt(10)];
+    area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    areaA = TriArea([x1, y1], [x2, y2], point);
+    areaB = TriArea(point, [x2, y2], [x3, y3]);
+    areaC= TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    point = [mouseX + 10, mouseY + sqrt(10)];
+    area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    areaA = TriArea([x1, y1], [x2, y2], point);
+    areaB = TriArea(point, [x2, y2], [x3, y3]);
+    areaC= TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    point = [mouseX + 10, mouseY - sqrt(10)];
+    area = TriArea([x1, y1], [x2, y2], [x3, y3]);
+    areaA = TriArea([x1, y1], [x2, y2], point);
+    areaB = TriArea(point, [x2, y2], [x3, y3]);
+    areaC= TriArea([x1, y1], point, [x3, y3]);
+    if(abs(areaA + areaB + areaC - area) < 0.001){
+      return true;
+    }
+    return false;
+}
+function MouseRect(w1, h1, w2, h2){
+  if( w1 == 350 || w1 == 1000){
+    if(ready == 2){
+      if(mouseX+12 > w1 && (mouseX-12 < w1+w2) && (mouseY+12 > h1) && (mouseY-12 < (h1+h2))){
+        return true;
+      }
+    }else if(ready == 3){
+      if(mouseX +10> w1 && (mouseX-10< w1+w2) && (mouseY+10 > h1) && (mouseY-10 < (h1+h2))){
+        return true;
+      }
+    }
+  }else if(mouseX+17.5 > w1 && (mouseX-17.5 < w1+w2) && (mouseY+17.5 > h1) && (mouseY-17.5 < (h1+h2))){
+    return true;
+  }
+  return false;
+}
+function MouseCic(x,y,r){
+  if(dist(x, y, mouseX +12 , mouseY +12 ) < r/2 || dist(x,y, mouseX - 12, mouseY - 12) < r/2 || dist(x,y, mouseX + 12, mouseY - 12) < r/2 || dist(x,y, mouseX - 12, mouseY + 12) < r/2){
+    return true;
+  }
+  return false;
 }
