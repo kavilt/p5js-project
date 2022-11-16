@@ -1,5 +1,6 @@
 let game1Difficulty = 1; // sets type of maze
-let ready =0;
+let ready = 1;
+let start = 1;
 
 
 function drawGame1() { //  maze game,  pages 3-3.9
@@ -9,8 +10,6 @@ function drawGame1() { //  maze game,  pages 3-3.9
   normalButton.clr = [90, 20, 100];
   let hardButton = new button((640 + 190)*scalarW, 390*scalarH, 200, 90, 10, 10);
   hardButton.clr = [20, 20, 100];
-  let extremeButton = new button((640 + 210)*scalarW, 535*scalarH, 200, 90, 10, 10);
-  extremeButton.clr = [0, 30, 100];
 
   glow(color(40, 30, 100), 32);
   noStroke();
@@ -23,7 +22,6 @@ function drawGame1() { //  maze game,  pages 3-3.9
   easyButton.buttonWithText("easy", 40);
   normalButton.buttonWithText("normal", 40);
   hardButton.buttonWithText("hard", 40);
-  extremeButton.buttonWithText("extreme", 40);
 
 
   backButton.drawBack();
@@ -43,10 +41,6 @@ else if(hardButton.clicked) {
     game1Difficulty = 2;
     myPageChanger.change(3.2);
   }
-else if(extremeButton.clicked) {
-    game1Difficulty = 3;
-    myPageChanger.change(3.2);
-  }
 }
 function drawGame1DifficultySelect() {
 
@@ -57,11 +51,22 @@ function drawMaze(){
   if(backButton.clicked) {
     myPageChanger.change(3);
   } 
+  glow(color(40, 30, 100), 32);
+  noStroke();
+  fill(0, 0, 100);
+  textSize((100*scalarW) + myPageChanger.transitionPercentExponential*4);
+  text("Maze", 200 - myPageChanger.transitionPercentExponential * 11, 100*scalarH);
+  textSize((60*scalarW) + myPageChanger.transitionPercentExponential*2.5);
+  text("Move your", 200 - myPageChanger.transitionPercentExponential * 6, 250*scalarH);
+  text("mouse", 200 - myPageChanger.transitionPercentExponential * 6, 320*scalarH);
+  text("through", 200 - myPageChanger.transitionPercentExponential * 6, 380*scalarH);
+  text("the maze", 200 - myPageChanger.transitionPercentExponential * 6, 440*scalarH);
+  noGlow();
   fill(255,0,255);
   rect(350,0,30,520);
   rect(350,570,30,50);
   rect(1000, 620, 30, -570);
-  if(game1Difficulty == 3){
+  if(game1Difficulty == 2){
     rect(430, 570, 30, -520);
     rect(430, 50, 100, 30);
     rect(580, 000, 30, 130);
@@ -132,6 +137,7 @@ function drawMaze(){
     triangle(470, 170, 495, 300, 480, 390);
     ready = 3;
   }
+
   playGame1();
 }
 function playGame1(){
@@ -140,92 +146,70 @@ function playGame1(){
     stroke('orange');
     line(mouseX, mouseY, pmouseX, pmouseY);
     if(MouseRect(430, 50, 30, 520)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(430, 50, 100, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(580, 000, 30, 130)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(520, 130, 90, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(430, 540, 520, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(510, 130, 30, 150)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(510, 280, 30, 130)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(430, 460, 240, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(590, 220, 30, 190)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(670, 50, 30, 250)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(670, 340,30, 150)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(590, 220, 80, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(750, 460, 250, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(670, 100, 350, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(750, 0, 30, 50)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(670, 260, 200, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(820, 30, 30, 100)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(670, 330, 200, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(750, 180, 260, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(910, 180, 30, 220)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(750, 400, 190, 30)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     if(MouseRect(900, 0, 30, 50)){
-      fill('red');
-      rect(500, 50, 50);
+      endMaze();
     }
     
   }
@@ -234,96 +218,73 @@ function playGame1(){
     stroke('orange');
     line(mouseX, mouseY, pmouseX, pmouseY);
     if(MouseCic(580, 250, 50)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(480, 300, 100)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(640, 100, 75)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(480, 360, 90)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(675, 75, 150)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(500, 50, 50)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(590, 385, 65)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(480, 420, 50)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(750, 560, 100)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(900, 100, 100)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(850, 460, 200)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(775, 245, 70)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(850, 250, 100)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(450, 200, 85)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(500, 430, 60)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(600, 550, 100)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(700, 350, 100)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(960, 180, 50)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(470, 550, 75)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(680, 250, 80)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(550, 150, 60)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(800, 155, 60)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
     if(MouseCic(950, 300, 75)){
-      fill('red');
-      rect(100,50,50,50);
+      endMaze();
     }
 
   }
@@ -333,78 +294,60 @@ function playGame1(){
     stroke('orange');
     line(mouseX, mouseY, pmouseX, pmouseY);
   if(MouseTriangle(500,450, 550,200, 600, 500)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(480,60, 580, 200, 650, 125)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(390, 0, 600, 50, 750, 25)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(980, 60, 750, 55, 800, 100)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(880, 450, 925, 580, 800, 360)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(790, 0, 850, 30, 990, 25)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(600, 250, 640, 200, 700, 390)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(390, 200, 425, 185, 435, 300)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(680, 580, 620, 480, 700, 420)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(390, 490, 420, 525, 450, 575)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(480, 500, 550, 560, 600, 580)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(750, 250, 825, 335, 900, 180)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(980, 200, 850, 350, 900, 400)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(725, 450, 800, 425, 780, 590)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(675, 150, 800, 120, 725, 250)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(400, 80, 450, 110, 415, 150)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
   if(MouseTriangle(470, 170, 495, 300, 480, 390)){
-    fill('red');
-    rect(100,50,50,50);
+    endMaze();
   }
 }
 
 if(MouseRect(350,0,30,520) || MouseRect(350,570,30,50)|| MouseRect(1000, 50, 30, 570)){
-  fill('red');
-  rect(100,50,50,50);
+  endMaze();
 }
 }
 function TriArea(a, b, c) {
@@ -499,4 +442,14 @@ function MouseCic(x,y,r){
     return true;
   }
   return false;
+}
+function endMaze(){
+  ready = 0;
+  glow(color(40, 30, 100), 32);
+  noStroke();
+  fill('red');
+  textSize((100*scalarW) + myPageChanger.transitionPercentExponential*4);
+  text("End Game", 400 - myPageChanger.transitionPercentExponential * 11, 100*scalarH);
+  noGlow();
+  start = 0;
 }
