@@ -1,4 +1,5 @@
 // buttons can have images inside them
+let count = 1;
 function button(x, y, width, height, thickness, roundness=0, solid=false) {
     this.x = x;
     this.y = y;
@@ -107,11 +108,11 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
     stroke(0, 0, 100);
     strokeWeight(5);
     rect(-this.width/2 + 20, this.height/2 - 44, 150, 60, 10);
-  
     noStroke();
     fill(0, 0, 100);
     textSize(30);
-    text("game 1",-this.width/2 + 95, this.height/2 - 16);
+    text("Game",-this.width/2 + 95, this.height/2 - 16);
+
   
     pop();
   }

@@ -43,7 +43,7 @@ lane.prototype.addNote = function (time) {
 
 lane.prototype.drawLane = function () {
     // Outline of lane
-    noGlow();
+
     noStroke();
     fill(color(0, 0, 35, 50));
     rect(this.x, this.y, laneWidth, laneHeight);
@@ -52,7 +52,7 @@ lane.prototype.drawLane = function () {
     stroke(color(0, 0, 40));
     noFill();
     rect(this.x, this.y, laneWidth, laneHeight);
-
+    
     noGlow();
 
     stroke(0, 0, 30);
@@ -193,6 +193,12 @@ function drawLanes() {
         lanes[i].update();
         lanes[i].drawLane();
     }
+    noStroke();
+    fill(0, 0, 100);
+    textSize((60*scalarW) + myPageChanger.transitionPercentExponential*2.5);
+    text("Press D, F, J , and K", 300 - myPageChanger.transitionPercentExponential * 11, 100*scalarH);
+    text("in time with the beat!", 300 - myPageChanger.transitionPercentExponential * 6, 250*scalarH);
+    noGlow();
 }
 
 
@@ -733,12 +739,14 @@ function drawGame3SongSelect() {
     rect(175 * scalarW, h * 0.93, w, h * 0.07);
 
     // start button
+    fill('black');
     startGame3button.buttonWithText("START", 32);
     if (startGame3button.clicked) {
         init = false;
         myPageChanger.change(5);
         myScrollList.stopPreview();
     }
+    fill(0, 0, 100);
 }
 
 function calculateAccuracy() {
