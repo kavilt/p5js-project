@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 0; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 5.2; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 let keys = [];
 let typeTap = [];
 let typed = [];

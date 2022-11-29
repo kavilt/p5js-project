@@ -36,6 +36,9 @@ function draw() {
         case 5.1:
         drawGame3SongSelect();
         break;
+        case 5.2:
+        drawGame3EndScreen();
+        break;
     }
 
     resetMatrix();
