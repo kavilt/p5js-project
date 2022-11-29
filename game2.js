@@ -246,7 +246,7 @@ function drawGame2DifficultySelect() {
     noStroke();
     fill(0, 0, 100);
     textSize((100*scalarW) + myPageChanger.transitionPercentExponential*4);
-    text("game title", 350 - myPageChanger.transitionPercentExponential * 11, 290*scalarH);
+    text("Duck Hunt", 350 - myPageChanger.transitionPercentExponential * 11, 290*scalarH);
     textSize((90*scalarW) + myPageChanger.transitionPercentExponential*2.5);
     text("difficulty", 390 - myPageChanger.transitionPercentExponential * 6, 420*scalarH);
 

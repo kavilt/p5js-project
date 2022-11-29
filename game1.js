@@ -70,8 +70,10 @@ function drawMaze(){
   noGlow();
   fill(255,0,255);
   rect(350,0,30,520);
-  rect(350,570,30,50);
+  rect(350,570,30,500);
   rect(1000, 620, 30, -570);
+  rect(350, 620, 680, 30);
+
   if(ready == 0 && end == 0){
     glow(color(40, 30, 100), 32);
     noStroke();
@@ -268,6 +270,10 @@ function playGame1(){
       point += 1;
       endMaze();
     }
+    if(pmouseY > 630 -12 && pmouseX > 360){
+      point += 1;
+      endMaze();
+    }
     
   }
   if(ready == 2){
@@ -366,6 +372,10 @@ function playGame1(){
       point += 1;
       endMaze();
     }
+    if(pmouseY > 630-12 && pmouseX > 360){
+      point += 1;
+      endMaze();
+    }
 
   }
 
@@ -441,9 +451,13 @@ function playGame1(){
     point += 1;
     endMaze();
   }
+  if(pmouseY > 630-8 && pmouseX > 360){
+    point += 1;
+    endMaze();
+  }
 }
 
-if(MouseRect(350,0,30,520) || MouseRect(350,570,30,50)|| MouseRect(1000, 50, 30, 570)){
+if(MouseRect(350,0,30,520) || MouseRect(350,570,30,500)|| MouseRect(1000, 50, 30, 570)){
   point += 1;
   endMaze();
 }
