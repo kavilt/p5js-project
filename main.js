@@ -21,6 +21,12 @@ function draw() {
         case 3:
         drawGame1();
         break;
+        case 3.1:
+        drawGame1DifficultySelect();
+        break;
+        case 3.2:
+        drawMaze();
+        break;
         case 4:
         drawGame2();
         break;
