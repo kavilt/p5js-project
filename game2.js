@@ -193,6 +193,9 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
     }
     if(backButton.clicked) {
         myPageChanger.change(4.1);
+        if (game2Score > game2Scores[game2Difficulty]) {
+            game2Scores[game2Difficulty] = game2Score;
+        }
     } 
     else if (clicked && fireAnimation < 10) { // if click, start animating recoil and play shoot sound
         fireAnimationIncreasing = true;
@@ -226,6 +229,9 @@ function drawGame2() { // duck hunt game,  pages 4-4.9
 
     // switch to death scene if dead
     if (game2Lives == 0) {
+        if (game2Score > game2Scores[game2Difficulty]) {
+            game2Scores[game2Difficulty] = game2Score;
+        }
         game2Lives = -1;
         myPageChanger.change(4.2);
         loseSound.play();

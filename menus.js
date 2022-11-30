@@ -72,6 +72,50 @@ function drawMenu() {
     if(backButton.clicked) {
       myPageChanger.change(0);
     }
+    
+    textAlign(CENTER);
+    strokeWeight(0);
+    stroke(0, 0, 100);
+    fill(0, 0, 100);
+    glow(color(0, 0, 100), 32);
+    textSize(70 * scalarW);
+    text("High Scores", width/2, 100*scalarH);
+
+    // boxes
+    noFill();
+    stroke(0, 0, 80);
+    strokeWeight(5);
+    rect(50*scalarW, 150*scalarH, width/2-100*scalarW, height-250*scalarH, 5);
+    rect(width/2+50*scalarW, 150*scalarH, width/2-100*scalarW, height-250*scalarH, 5);
+    line(70 * scalarW, 240*scalarH, width/2-75*scalarW, 240*scalarH);
+    line(width/2 + 70 * scalarW, 240*scalarH, width-75*scalarW, 240*scalarH);
+
+    textAlign(LEFT);
+    noStroke();
+    fill(0, 0, 100);
+    textSize(50 * scalarW);
+    text("Maze Game", 80*scalarW, 200*scalarH);
+    text("Duckhunt", width/2+80*scalarW, 200*scalarH);
+
+    text("Easy", 80*scalarW, 300*scalarH);
+    text("Medium", 80*scalarW, 410*scalarH);
+    text("Hard", 80*scalarW, 520*scalarH);
+
+    text("Easy", width/2 + 80*scalarW, 300*scalarH);
+    text("Medium", width/2 + 80*scalarW, 380*scalarH);
+    text("Hard", width/2 + 80*scalarW, 460*scalarH);
+    text("Extreme", width/2 + 80*scalarW, 540*scalarH);
+    
+    textAlign(CENTER);
+    text(game1Scores[0], width/2 - 150*scalarW, 300*scalarH);
+    text(game1Scores[1], width/2 - 150*scalarW, 410*scalarH);
+    text(game1Scores[2], width/2 - 150*scalarW, 520*scalarH);
+
+    text(game2Scores[1], width - 150*scalarW, 380*scalarH);
+    text(game2Scores[2], width - 150*scalarW, 460*scalarH);
+    text(game2Scores[3], width - 150*scalarW, 540*scalarH);
+    text(game2Scores[0], width - 150*scalarW, 300*scalarH);
+
   }
   
   // game 2 variables

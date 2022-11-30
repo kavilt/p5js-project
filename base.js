@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 5.2; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 2; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 let keys = [];
 let typeTap = [];
 let typed = [];
@@ -11,6 +11,9 @@ let scalarH = (h / 720);
 let canvas2;
 let myScrollList;
 let musicVolume = 0.1;
+
+let game1Scores = [999, 999, 999];
+let game2Scores = [0, 0, 0, 0];
 
 // beat timing management
 let timeSinceNewSong = 0;

@@ -89,6 +89,12 @@ function drawMaze(){
     text("You Win!", 700 - myPageChanger.transitionPercentExponential * 11, 100*scalarH);
     text("You got " + point + "point(s)!", 700 - myPageChanger.transitionPercentExponential * 11, 250*scalarH);
     text("Can you get fewer?", 700 - myPageChanger.transitionPercentExponential * 11, 400*scalarH);
+    
+
+    // if highscore, set new highscore
+    if (point < game1Scores[game1Difficulty-1]) {
+        game1Scores[game1Difficulty-1] = point;
+    }
     noGlow();
   }else{
   if(game1Difficulty == 2){
