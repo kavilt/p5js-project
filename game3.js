@@ -15,12 +15,17 @@ let timeSinceLastHit = 0;
 let hits = [];
 let combo = 0;
 let songOver = false;
+let game3Score = 0;
+let game3HighScores = [];
+let totalNotes = 0;
+let maxScore;
+// score calculation: maxScore = totalNotes * totalComboMultiplier -> scale to 1 million
 
 let leniency = 4.5; // how many frames can the user be off by, and still receive max?
 
 let songOffset = 0; // start the song at x beats
 
-let songSkipTo = 0;
+let songSkipTo = 160;
 
 let gen;
 
@@ -144,7 +149,7 @@ lane.prototype.drawNotes = function () {
         }
         noStroke();
         circle(this.x + laneWidth / 2, this.notes[i].position + this.y, laneWidth / 2);
-        text(this.notes[i].beatTime, this.x + 30, this.notes[i].position + this.y - 70);
+        //this.notes[i].beatTime, this.x + 30, this.notes[i].position + this.y - 70);
         if (!this.notes[i].alive) { // notes scrolled off the screen, weren't hit
             combo = 0;
             this.missAnimation = 50;
@@ -267,7 +272,9 @@ let generator = function (bpm, offset, file) {
 
         timeSinceNewSong = millis() - time; // song started
         if (timeSinceNewSong > timeOfNextBeat) { // beat elapsed
-
+            if(this.totalBeats % 1 == 0) {
+                flashAlpha = 10;
+            }
             // scan text file, determine what action to take
             // this.scnLine[0] refers to the number in the textfile (the beat count)
             if (this.totalBeats >= parseFloat(this.scnLine[0]) && !songOver) {
@@ -282,45 +289,51 @@ let generator = function (bpm, offset, file) {
 
             this.totalBeats += this.rate;
 
-            // generate notes based on mode
-            switch (this.mode) {
-                case 'singleStream':
-                    this.singleStream();
-                    break;
-                case 'lightJumpStream':
-                    this.lightJumpStream();
-                    break;
-                case 'denseJumpStream':
-                    this.denseJumpStream();
-                    break;
-                case 'rollLeft':
-                    this.roll();
-                    break;
-                case 'rollRight':
-                    this.roll(true);
-                    break;
-                case 'rest':
-                    break;
-                case 'single':
-                    this.single(this.args[0]);
-                    break;
-                case 'jump':
-                    this.jump(this.args[0], this.args[1]);
-                    break;
-                case 'hand':
-                    this.jump(this.args[0], this.args[1], this.args[2]);
-                    break;
-                case 'quad':
-                    this.quad();
-            }
-
-            this.pruneHistory();
+            this.genNotes();
 
             msPerBeat = 60 * 1000 / this.bpm * this.rate;
             timeOfNextBeat += msPerBeat;
         }
     }
+
+    this.genNotes = function() {
+        // generate notes based on mode
+        switch (this.mode) {
+            case 'singleStream':
+                this.singleStream();
+                break;
+            case 'lightJumpStream':
+                this.lightJumpStream();
+                break;
+            case 'denseJumpStream':
+                this.denseJumpStream();
+                break;
+            case 'rollLeft':
+                this.roll();
+                break;
+            case 'rollRight':
+                this.roll(true);
+                break;
+            case 'rest':
+                break;
+            case 'single':
+                this.single(this.args[0]);
+                break;
+            case 'jump':
+                this.jump(this.args[0], this.args[1]);
+                break;
+            case 'hand':
+                this.hand(this.args[0], this.args[1], this.args[2]);
+                break;
+            case 'quad':
+                this.quad();
+        }
+
+        this.pruneHistory();
+    }
 }
+
+
 generator.prototype.getLine = function () { // also returns the 
     if (this.currentLine < this.scnLines.length - 1) {
         this.currentLine++;
@@ -379,6 +392,7 @@ generator.prototype.scan = function () { // scan lines of text file (read until 
     // console.log(this.scnLine[1]);
 
 }
+
 generator.prototype.setMode = function (mode, rate) {
     this.previousMode = this.mode;
     this.mode = mode;
@@ -583,10 +597,10 @@ generator.prototype.skipTo = function (line) {
 
 function makeNote(laneNum) {
     lanes[laneNum].addNote(gen.totalBeats);
+    totalNotes ++;
 }
 
-
-
+let flashAlpha = 0;
 
 let startCountdown = 0
 let started = false;
@@ -594,8 +608,14 @@ let init = false;
 let item;
 let skip = 0;
 function drawGame3() { // piano tiles game,  pages 5-5.9
+
+    fill(0, 0, 100, flashAlpha / 4);
+    rect(0, 0, w, h);
+    flashAlpha -= 2;
+
     if (!init) {
         init = true;
+        maxScore = calculateTotalScore();
         initGame3();
     }
 
@@ -627,7 +647,7 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
     fill(0, 0, 100, 50);
     noStroke();
     text(combo, laneStartX + (numLanes / 2) * laneWidth, 200);
-
+    text(round(calculateScore(maxScore)), laneStartX + (numLanes / 2) * laneWidth - 500, 200);
     textAlign(RIGHT);
     //text(round(calculateAccuracy()*100, 2), 1210, 80);
     textAlign(CENTER);
@@ -643,8 +663,6 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
 
     timeSinceLastHit++;
 }
-
-
 
 /** User can:
  * choose song using scroll list (right side)
@@ -664,13 +682,13 @@ function initSongSelect() {
     item.song.play();
 }
 
-let flashAlpha = 0;
 let startGame3button = new button(w * 0.82, h * 0.85, 200 * scalarW, 100, 10, 10);
 function drawGame3SongSelect() {
     timeSinceNewSong = millis() - time;
     msPerBeat = 60 * 1000 / myScrollList.scrollElements[myScrollList.selected].bpm;
     fill(0, 0, 100, flashAlpha / 4);
     rect(0, 0, w, h);
+    flashAlpha -= 2;
     //text(round(timeSinceNewSong)+"ms, " + round(timeOfNextBeat), 40, 20);
     // 
     if (timeSinceNewSong > timeOfNextBeat) {
@@ -680,7 +698,6 @@ function drawGame3SongSelect() {
         buttonClickSound.play();
     }
 
-    flashAlpha -= 2;
 
     backButton.drawBack();
     if (backButton.clicked) {
@@ -749,6 +766,19 @@ function drawGame3SongSelect() {
     fill(0, 0, 100);
 }
 
+// page 5.2on
+function drawGame3EndScreen() {
+    
+    // dra
+
+
+
+    backButton.drawBack();
+    if (backButton.clicked) {
+        myPageChanger.change(5.1);
+    }
+}
+
 function calculateAccuracy() {
     let sum = 0;
     if (hits.length == 0) {
@@ -760,12 +790,32 @@ function calculateAccuracy() {
     return sum / (300 * hits.length);
 }
 
+function calculateScore(maxScore) {
+    // scale maxScore between 0 and 1 million, find the conversion factor
+    let conversion = 100000 / maxScore;
+
+    // calculate score using values in hits[]
+    let currentScore = 0;
+    let combo = 0;
+    for (let i = 0; i < hits.length; i ++) {
+        currentScore += hits[i] * (1 + combo/totalNotes);
+        if (hits[i] != 0) {
+            combo ++;
+        } else {
+            combo = 0;
+        }
+    }
+
+    return currentScore * conversion;
+}
+
 function initGame3() {
     hits = [];
     combo = 0;
     for (let i = 0; i < lanes.length; i++) {
         lanes[i].notes = [];
     }
+    songOver = false;
     time = millis();
     timeSinceNewSong = 0;
     timeOfNextBeat = 0;
@@ -775,5 +825,32 @@ function initGame3() {
     gen = new generator(item.bpm, 0, item.file);
 }
 
+function calculateTotalScore() {
+    // calculate total notes by doing a fake gen run
+    totalNotes = 0;
+    initGame3(); // make sure all variables are reset
+    while (!songOver) {
+        if (gen.totalBeats >= parseFloat(gen.scnLine[0]) && !songOver) {
+            gen.scan();
+        }
+        gen.update();
+        gen.genNotes();
+        gen.totalBeats += gen.rate;
+        if (gen.currentLine >= gen.scnLines.length-1) {
+            songOver = true;
+        }
+    }
 
+    console.log("total notes:" + totalNotes);
 
+    // calculate max score including combo multiplier
+    // combo multiplier = noteValue * (1+combo/100)
+    let maxScore = 0;
+    for (let combo = 0; combo < totalNotes; combo ++) {
+        maxScore += 300 * (1 + combo/totalNotes);
+    }
+
+    console.log("total score: " + maxScore);
+
+    return maxScore;
+}

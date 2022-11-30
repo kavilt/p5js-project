@@ -3,26 +3,24 @@ let ready = 1;
 let point = 0;
 let end = 0;
 
-
+let easyButtonGame1 = new button((690 + 150)*scalarW, 100*scalarH, 200, 90, 10, 10);
+let normalButtonGame1 = new button((690 + 170)*scalarW, 305*scalarH, 200, 90, 10, 10);
+let hardButtonGame1 = new button((690 + 190)*scalarW, 500*scalarH, 200, 90, 10, 10);
 function drawGame1() { //  maze game,  pages 3-3.9
-  backButton.drawBack();
-  let easyButton = new button((640 + 150)*scalarW, 100*scalarH, 200, 90, 10, 10)
-  let normalButton = new button((640 + 170)*scalarW, 245*scalarH, 200, 90, 10, 10);
-  normalButton.clr = [90, 20, 100];
-  let hardButton = new button((640 + 190)*scalarW, 390*scalarH, 200, 90, 10, 10);
-  hardButton.clr = [20, 20, 100];
+    normalButtonGame1.clr = [90, 20, 100];
+    hardButtonGame1.clr = [20, 20, 100];
 
   glow(color(40, 30, 100), 32);
   noStroke();
   fill(0, 0, 100);
   textSize((100*scalarW) + myPageChanger.transitionPercentExponential*4);
-  text("Maze", 350 - myPageChanger.transitionPercentExponential * 11, 290*scalarH);
+  text("Maze", 350*scalarW - myPageChanger.transitionPercentExponential * 11, 290*scalarH);
   textSize((90*scalarW) + myPageChanger.transitionPercentExponential*2.5);
-  text("difficulty settings", 390 - myPageChanger.transitionPercentExponential * 6, 420*scalarH);
+  text("difficulty settings", 390*scalarW - myPageChanger.transitionPercentExponential * 6, 420*scalarH);
 
-  easyButton.buttonWithText("easy", 40);
-  normalButton.buttonWithText("normal", 40);
-  hardButton.buttonWithText("hard", 40);
+  easyButtonGame1.buttonWithText("easy", 40);
+  normalButtonGame1.buttonWithText("normal", 40);
+  hardButtonGame1.buttonWithText("hard", 40);
 
 
   backButton.drawBack();
@@ -30,15 +28,15 @@ function drawGame1() { //  maze game,  pages 3-3.9
   if(backButton.clicked) {
     myPageChanger.change(1);
   } 
-  if(easyButton.clicked) {
+  if(easyButtonGame1.clicked) {
     game1Difficulty = 0;
     myPageChanger.change(3.2);
   }
-else if(normalButton.clicked) {
+else if(normalButtonGame1.clicked) {
     game1Difficulty = 1;
     myPageChanger.change(3.2);
   }
-else if(hardButton.clicked) {
+else if(hardButtonGame1.clicked) {
     game1Difficulty = 2;
     myPageChanger.change(3.2);
   }

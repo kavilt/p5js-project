@@ -26,7 +26,6 @@ function drawMenu() {
     game3Button = new button(w/2+(230*(w/1280)), (290*scalarH), selectScale, selectScale, 10*scalarW, 10);
   }
   function drawSelect() {
-    // circles
     
       if(scalarH > 0.6) {
         glow(color(40, 40, 100), 32);
@@ -44,9 +43,9 @@ function drawMenu() {
         text("select", w*0.81, (190*scalarH) + myPageChanger.transitionPercentExponential*5);
       }
   
-    game1Button.drawGame2();
-    game2Button.drawGame2();
-    game3Button.drawGame2();
+    game1Button.drawGameButton(mazeThumbnail, 0.2 * scalarH, "Maze");
+    game2Button.drawGameButton(crosshairThumbnail, 0.2 * scalarH, "Duckhunt");
+    game3Button.drawGameButton(noteThumbnail, 0.2 * scalarH, "Game 3");
   
     backButton.drawBack();
     if (backButton.clicked) {

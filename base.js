@@ -1,6 +1,6 @@
 
 // Declare Variables
-let page = 0; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
+let page = 5.2; // 0 = menu, 1 = game select, 2 = view scores, >2 = games
 let keys = [];
 let typeTap = [];
 let typed = [];
@@ -29,6 +29,9 @@ let songs = [];
 let title;
 let heart;
 let playButton;
+let mazeThumbnail;
+let crosshairThumbnail;
+let noteThumbnail;
 let thumbnails = []; // game3 song covers
 let previews = [];
 
@@ -53,6 +56,9 @@ function preload() {
     heart = loadImage('assets/heart.png');
     playButton = loadImage('assets/playbutton.png');
 
+    mazeThumbnail = loadImage('assets/maze.png');
+    crosshairThumbnail = loadImage('assets/crosshair.png');
+    noteThumbnail = loadImage('assets/note.png');
 }
 
 function setup() {
@@ -66,6 +72,9 @@ function setup() {
     addSongs();
     playButton.resize(45 * scalarW, 0);
 
+    mazeThumbnail.filter(INVERT);
+    crosshairThumbnail.filter(INVERT);
+    noteThumbnail.filter(INVERT);
 
 }
 

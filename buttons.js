@@ -92,11 +92,11 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
     pop();
   }
   
-  // game select screen buttons
-  button.prototype.drawGame2 = function() {
+  // game select screen buttons with image in the center
+  button.prototype.drawGameButton = function(src, scl, txt) {
     push();
     this.drawBorder();
-    circle(0, 0, 40, 40);
+    drawImage(src, 0, 0, scl, scl);
   
     noStroke();
     glow(color(200, 100, 100), 32);
@@ -111,7 +111,7 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
     noStroke();
     fill(0, 0, 100);
     textSize(30);
-    text("Game",-this.width/2 + 95, this.height/2 - 16);
+    text(txt,-this.width/2 + 95, this.height/2 - 13);
 
   
     pop();
