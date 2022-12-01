@@ -20,6 +20,8 @@ function scrollList(x, y, w, h, thickness) {
     this.animationPercent = 0;
     this.preview = prev;
     this.file = file;
+    this.highScore = 0;
+    this.bestAcc = 0;
   }
   this.scrollElements = [];
 

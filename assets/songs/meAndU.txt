@@ -46,16 +46,4 @@
 118 denseJumpStream 0.5
 128 quad
 128 rest
-136 hand 0 1 2
-142 hand 0 2 3
-144 setBeat 0
-144 denseJumpStream 0.5
-152 singleStream 0.25
-160 setBeat 0
-160 denseJumpStream 0.25
-160 rest
-165 setBeat 1
-165 lightJumpStream 0.25
-168 rest
-1000000 singleStream 0.25
-1000000 singleStream 0.25
+128 end

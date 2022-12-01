@@ -60,12 +60,14 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
     }
   }
   
-  button.prototype.drawBorder = function(){ // all buttons inherit this border
+  button.prototype.drawBorder = function(c){ // all buttons inherit this border
+    if (arguments.length == 0) { c = [0, 0, 100, 100]; }
     this.update();
     translate(this.x + this.width/2, this.y + this.height/2);
     scale(this.expansion);
     rotate((this.expansion-1)*7)
-    glow(color(207, 7, 100, 100-this.flicker), 35);
+    c = color(c[0], c[1], c[2], c[3]-this.flicker);
+    glow(c, 35);
     strokeWeight(this.border);
     stroke(207, 7, 100, 100-this.flicker);
     if(this.solid) {
@@ -80,12 +82,13 @@ function button(x, y, width, height, thickness, roundness=0, solid=false) {
   // Each button will have its custom function, because they all look different
   
   // START button
-  button.prototype.buttonWithText = function(txt, txtSize) { 
+  button.prototype.buttonWithText = function(txt, txtSize, c) { 
+    if (arguments.length == 2) { c = [0, 0, 100, 100]; }
     push();
-    this.drawBorder();
+    this.drawBorder(c);
     textSize(txtSize);
     textFont('Consolas');
-    fill(360, 0, 100);
+    fill(0, 0, 100);
     noStroke();
   
     text(txt, 0, 0);

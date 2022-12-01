@@ -14,18 +14,20 @@ let recentHit = 0;
 let timeSinceLastHit = 0;
 let hits = [];
 let combo = 0;
+let maxCombo = 0;
 let songOver = false;
 let game3Score = 0;
 let game3HighScores = [];
 let totalNotes = 0;
+let finalTotalNotes = 0;
 let maxScore;
 // score calculation: maxScore = totalNotes * totalComboMultiplier -> scale to 1 million
 
-let leniency = 4.5; // how many frames can the user be off by, and still receive max?
+let leniency = 3; // how many frames can the user be off by, and still receive max?
 
-let songOffset = 0; // start the song at x beats
+let songOffset = -1; // offset in frames, where negative means hitting later is better
 
-let songSkipTo = 160;
+let songSkipTo = 0; //160
 
 let gen;
 
@@ -60,11 +62,24 @@ lane.prototype.drawLane = function () {
     
     noGlow();
 
-    stroke(0, 0, 30);
+    stroke(0, 0, 50);
+    strokeWeight(5);
     line(this.x, this.y + this.height - laneWidth, this.x + laneWidth, this.y + this.height - laneWidth);
-    stroke(0, 0, 0);
 
+    // circle to indicate when to press keys
+    strokeWeight(2);
+    stroke(0, 0, 100, 50);
+    circle(this.x + laneWidth/2, this.y + this.height - laneWidth/2, laneWidth*0.75);
+
+    // text the correct letter inside the circle
+    fill(0, 0, 100);
+    textSize(30 * scalarW);
+    text(String.fromCharCode(controls[this.ind]), this.x + laneWidth/2, this.y + this.height - laneWidth/2);
+
+    strokeWeight(7);
+    
     // draw individual notes in lane
+    stroke(0, 0, 0);
     this.drawNotes();
     fill(0, 0, 0); // idk, but note highlights breaks without this
 
@@ -102,28 +117,32 @@ lane.prototype.update = function () {
         buttonClickSound.stop();
         buttonClickSound.play();
         if (this.notes.length > 0) {
-            if (Math.abs(this.notes[0].timeToPF) < leniency * 3) {
-                combo++;
+            if (Math.abs(this.notes[0].timeToPF - songOffset) < leniency * 3) {
+                combo ++;
+                if (combo > maxCombo) {
+                    maxCombo = combo;
+                }
+
                 timeSinceLastHit = 0;
                 // calculate hit judgement (and set hit color)
-                if (Math.abs(this.notes[0].timeToPF) < leniency) {
+                if (Math.abs(this.notes[0].timeToPF - songOffset) < leniency) {
                     hits.push(300); // perfect!
                     recentHit = 300;
                     this.hitColor = [200, 100, 100, 100];
                 }
-                else if (Math.abs(this.notes[0].timeToPF) < leniency * 2) {
+                else if (Math.abs(this.notes[0].timeToPF - songOffset) < leniency * 2) {
                     hits.push(200); // okay
                     recentHit = 200;
                     this.hitColor = [60, 100, 100, 100];
                 }
-                else if (Math.abs(this.notes[0].timeToPF) < leniency * 2.5) {
+                else if (Math.abs(this.notes[0].timeToPF - songOffset) < leniency * 2.5) {
                     hits.push(100); // bad :(
                     recentHit = 100;
                     this.hitColor = [270, 100, 100, 100];
                 }
 
                 this.notes.splice(0, 1); //remove the note!
-            } else if (Math.abs(this.notes[0].timeToPF < leniency * 3)) { // if the input is wayyyy too early, just ignore it
+            } else if (Math.abs(this.notes[0].timeToPF - songOffset ) < leniency * 4) { // if the input is wayyyy too early, just ignore it
                 this.notes.splice(0, 1);
                 this.missAnimation = 50;
                 combo = 0;
@@ -198,12 +217,6 @@ function drawLanes() {
         lanes[i].update();
         lanes[i].drawLane();
     }
-    noStroke();
-    fill(0, 0, 100);
-    textSize((60*scalarW) + myPageChanger.transitionPercentExponential*2.5);
-    text("Press D, F, J , and K", 300 - myPageChanger.transitionPercentExponential * 11, 100*scalarH);
-    text("in time with the beat!", 300 - myPageChanger.transitionPercentExponential * 6, 250*scalarH);
-    noGlow();
 }
 
 
@@ -227,7 +240,7 @@ function drawLanes() {
  */
 
 const modes = ['singleStream', 'lightJumpStream', 'denseJumpStream', 'rollLeft', 'rollRight', 'rest']; // none require args
-const commands = ['setBpm', 'setBeat', 'setLane']
+const commands = ['setBpm', 'setBeat', 'setLane', 'end'];
 let generator = function (bpm, offset, file) {
     this.bpm = bpm;
     this.offset = offset; //  in beats
@@ -266,9 +279,6 @@ let generator = function (bpm, offset, file) {
     this.scnLine = this.getLine().split(" ");
 
     this.update = function () {
-        fill(0, 0, 100);
-        textSize(50);
-        text(this.totalBeats, 200, h / 2);
 
         timeSinceNewSong = millis() - time; // song started
         if (timeSinceNewSong > timeOfNextBeat) { // beat elapsed
@@ -363,6 +373,8 @@ generator.prototype.scan = function () { // scan lines of text file (read until 
                 break;
             case 'setLane':
                 this.line = parseInt(this.args[0]);
+                break;
+            case 'end':
                 break;
         }
 
@@ -607,15 +619,52 @@ let started = false;
 let init = false;
 let item;
 let skip = 0;
+let tutorialCountdown = 500;
+let ended = false;
+let endCountdown = 0;
 function drawGame3() { // piano tiles game,  pages 5-5.9
 
     fill(0, 0, 100, flashAlpha / 4);
     rect(0, 0, w, h);
     flashAlpha -= 2;
 
-    if (!init) {
+    drawLanes();
+
+    if (tutorialCountdown > 0) {
+        tutorialCountdown -= 3;
+
+        let a = 500 -(500 - tutorialCountdown); // alpha
+
+        fill(0, 0, 0, a);
+        rect(0, 0, width, height);
+
+        noStroke();
+        fill(0, 0, 100, a);
+
+        glow(color(0, 0, 100), 32);
+
+        textSize((60*scalarW) + myPageChanger.transitionPercentExponential*2.5);
+        text("press", width/2 - myPageChanger.transitionPercentExponential * 11, 100*scalarH);
+        text("in time with the beat!", width/2 - myPageChanger.transitionPercentExponential * 6, 300*scalarH);
+
+        textSize((80*scalarW) + myPageChanger.transitionPercentExponential*2.5);
+        text("D, F, J, K", width/2 - myPageChanger.transitionPercentExponential * 11, 200*scalarH);
+
+        noFill();
+        stroke(0, 0, 100, a);
+        strokeWeight(10);
+        rect(300*scalarW, 500*scalarH, width-600*scalarW, 30*scalarH, 50);
+        
+        noStroke();
+        fill(0, 0, 100);
+        rect(300*scalarW, 500*scalarH, map(tutorialCountdown, 500, 0, 0, width-600*scalarW), 30*scalarH, 50);
+        noGlow();
+    }
+
+    else if (!init) {
         init = true;
         maxScore = calculateTotalScore();
+        finalTotalNotes = totalNotes;
         initGame3();
     }
 
@@ -627,7 +676,7 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
     }
 
     startCountdown++;
-    if (!started && laneHeight / scrollSpeed < startCountdown) {
+    if (!started && laneHeight / scrollSpeed < startCountdown && init) {
         item.song.stop();
         item.song.seek(skip);
         item.song.volume(musicVolume);
@@ -635,25 +684,52 @@ function drawGame3() { // piano tiles game,  pages 5-5.9
         started = true;
     }
 
-    drawLanes();
 
     // do the note spawning
-    if (!songOver) {
+    if (!songOver && init) {
         gen.update();
     }
 
     // text stats
-    textSize(80);
-    fill(0, 0, 100, 50);
-    noStroke();
-    text(combo, laneStartX + (numLanes / 2) * laneWidth, 200);
-    text(round(calculateScore(maxScore)), laneStartX + (numLanes / 2) * laneWidth - 500, 200);
-    textAlign(RIGHT);
-    //text(round(calculateAccuracy()*100, 2), 1210, 80);
-    textAlign(CENTER);
 
-    fill(0, 0, 100, 70 - timeSinceLastHit * 5);
-    //text(recentHit, laneStartX + (numLanes/2) * laneWidth, 300);
+    if (init) {
+        textSize(100*scalarW);
+        fill(0, 0, 100);
+        noStroke();
+        text("SCORE", 300*scalarW, 200*scalarH);
+        
+        fill(0, 0, 100, 80);
+        textSize(80*scalarW);
+        text("accuracy", 300*scalarW, 400*scalarH);
+
+        fill(0, 0, 100, 60);
+        textSize(50*scalarW);
+        text("max combo", 300*scalarW, 550*scalarH);
+
+        textSize(80*scalarW);
+        fill(0, 0, 100, 50);
+        text(combo, laneStartX + (numLanes / 2) * laneWidth, 200);
+        text(round(calculateScore(maxScore)), 300 * scalarW, 300 * scalarH);
+        textSize(60*scalarW);
+        text(round(calculateAccuracy()*100, 2) + "%", 300*scalarW, 480 * scalarH);
+        textSize(40*scalarW);
+        text(maxCombo, 300*scalarW, 600*scalarH);
+        
+        fill(0, 0, 100, 70 - timeSinceLastHit * 5);
+    
+    }
+
+    if (init && songOver) { // song has ended!
+        console.log("end");
+        endCountdown ++;
+    }
+
+    if (endCountdown == 50) {
+         myPageChanger.change(5.2);
+         if (calculateScore(maxScore) > item.highScore) {
+            item.highScore = calculateScore(maxScore);
+         }
+    }
 
     backButton.drawBack();
     if (backButton.clicked) {
@@ -757,7 +833,7 @@ function drawGame3SongSelect() {
 
     // start button
     fill('black');
-    startGame3button.buttonWithText("START", 32);
+    startGame3button.buttonWithText("START", 32, [170, 80, 100, 100]);
     if (startGame3button.clicked) {
         init = false;
         myPageChanger.change(5);
@@ -768,14 +844,148 @@ function drawGame3SongSelect() {
 
 // page 5.2on
 function drawGame3EndScreen() {
-    
-    // dra
 
+    let item = myScrollList.scrollElements[myScrollList.selected];
+    
+    // draw top bar
+    fill(0, 0, 0, 20);
+    noStroke();
+    rect(0, 0, width, 120*scalarH);
+    
+    // draw images
+    let previewImageLarge = myScrollList.scrollElements[myScrollList.selected].imgLarge;
+
+    // far right big
+    image(previewImageLarge, 675 * scalarW, 180 * scalarH);
+
+    // top left small
+    let previewImage = myScrollList.scrollElements[myScrollList.selected].img;
+    previewImage.resize(80*scalarH, 0);
+    image(previewImage, 90 * scalarW, 20 * scalarH);
+
+    // top left elements
+    textAlign(LEFT);
+    textSize(40*scalarH);
+    fill(0, 0, 80);
+    text(item.name, 120*scalarW + 80*scalarH, 45 * scalarH);
+    textSize(30*scalarH);
+    text("by " + item.artist, 120*scalarW + 80*scalarH, 85*scalarH);
+
+    // score and combo boxes
+    textAlign(LEFT, BOTTOM);
+    glow(color(200, 100, 100), 32);
+    fill(0, 0, 100);
+    textSize(65*scalarH);
+    text("SCORE", 100*scalarW, 220*scalarH);
+    text("COMBO", 130*scalarW, 480*scalarH);
+    noGlow();
+
+    // score box
+    fill(0, 0, 100, 20);
+    rect(100*scalarW, 250*scalarH, 400*scalarW, 120*scalarH, 20);
+    fill(0, 0, 100);
+    rect(100*scalarW, 210*scalarH, 400*scalarW, 110*scalarH, 20);
+    rect(100*scalarW, 250*scalarH, 400*scalarW, 70*scalarH);
+    noFill();
+    strokeWeight(4);
+    stroke(200, 100, 100);
+    rect(100*scalarW, 210*scalarH, 400*scalarW, 160*scalarH, 20);
+
+    noStroke();
+    // combo box
+    fill(0, 0, 100, 20);
+    rect(210*scalarW, 470*scalarH, 400*scalarW, 130*scalarH, 20);
+    fill(0, 0, 100);
+    rect(130*scalarW, 470*scalarH, 250*scalarW, 130*scalarH, 20);
+    rect(150*scalarW, 470*scalarH, 230*scalarW, 130*scalarH);
+    noFill();
+    strokeWeight(4);
+    stroke(200, 100, 100);
+    rect(130*scalarW, 470*scalarH, 480*scalarW, 130*scalarH, 20);
+
+    noStroke();
+    textAlign(CENTER, CENTER);
+    fill(340, 80, 100);
+    text(round(calculateScore(maxScore)), 300*scalarW, 269*scalarH);
+    text(maxCombo, 255*scalarW, 539*scalarH);
+
+    textAlign(LEFT);
+    fill(0, 0, 100);
+    textSize(25*scalarH);
+    text("best score:", 110*scalarW, 345*scalarH);
+    
+    fill(190, 100, 100);
+    text("perfect", 390*scalarW, 490*scalarH);
+    fill(55, 100, 100);
+    text("okay", 390*scalarW, 520*scalarH);
+    fill(300, 100, 100);
+    text("bad", 390*scalarW, 550*scalarH);
+    fill(0, 100, 100);
+    text("miss", 390*scalarW, 580*scalarH);
+
+    let hitCount = [0, 0, 0, 0];
+    for (let i = 0; i < hits.length; i ++) {
+        if (hits[i] == 300) { hitCount[0] ++; }
+        if (hits[i] == 200) { hitCount[1] ++; }
+        if (hits[i] == 100) { hitCount[2] ++; }
+        if (hits[i] == 0) { hitCount[3] ++; }
+        
+    }
+
+    textAlign(RIGHT);
+    fill(0, 0, 100);
+    text(round(item.highScore), 490*scalarW, 345*scalarH);
+    fill(190, 100, 100);
+    text(hitCount[0], 590*scalarW, 490*scalarH);
+    fill(55, 100, 100);
+    text(hitCount[1], 590*scalarW, 520*scalarH);
+    fill(300, 100, 100);
+    text(hitCount[2], 590*scalarW, 550*scalarH);
+    fill(0, 100, 100);
+    text(hitCount[3], 590*scalarW, 580*scalarH);
+
+    textAlign(CENTER, CENTER);
+
+    // top right rank badge
+    let acc = calculateAccuracy() * 100;
+    if (acc > 95) {
+        fill(50, 100, 100);
+        glow(color(50, 100, 100), 32);
+        textSize(100*scalarH);
+        text("S", width-100*scalarW, 130*scalarH/2);
+    } else if (acc > 90) {
+        fill(120, 100, 100);
+        glow(color(120, 100, 100), 32);
+        textSize(100*scalarH);
+        text("A", width-100*scalarW, 130*scalarH/2);
+    } else if (acc > 85) {
+        fill(190, 80, 100);
+        glow(color(190, 80, 100), 32);
+        textSize(100*scalarH);
+        text("B", width-100*scalarW, 130*scalarH/2);
+    } else if (acc > 67) {
+        fill(300, 100, 100);
+        glow(color(300, 100, 100), 32);
+        textSize(100*scalarH);
+        text("C", width-100*scalarW, 130*scalarH/2);
+    } else {
+        fill(0, 100, 100);
+        glow(color(0, 100, 100), 32);
+        textSize(100*scalarH);
+        text("D", width-100*scalarW, 130*scalarH/2);
+    }
+
+    // top right accuracy 
+    fill(0, 0, 80);
+    noGlow();
+    textSize(40*scalarH);
+    text(round(acc, 2) + "%", width-230*scalarW, 130*scalarH/2);
 
 
     backButton.drawBack();
     if (backButton.clicked) {
         myPageChanger.change(5.1);
+        item.song.stop();
     }
 }
 
@@ -798,7 +1008,7 @@ function calculateScore(maxScore) {
     let currentScore = 0;
     let combo = 0;
     for (let i = 0; i < hits.length; i ++) {
-        currentScore += hits[i] * (1 + combo/totalNotes);
+        currentScore += hits[i] * (1 + combo/finalTotalNotes);
         if (hits[i] != 0) {
             combo ++;
         } else {
@@ -821,8 +1031,11 @@ function initGame3() {
     timeOfNextBeat = 0;
     startCountdown = 0;
     started = false;
+    songOver = false;
+    endCountdown = 0;
     item = myScrollList.scrollElements[myScrollList.selected];
     gen = new generator(item.bpm, 0, item.file);
+    maxCombo = 0;
 }
 
 function calculateTotalScore() {
