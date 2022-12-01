@@ -760,8 +760,9 @@ function initSongSelect() {
 
 let startGame3button = new button(w * 0.82, h * 0.85, 200 * scalarW, 100, 10, 10);
 function drawGame3SongSelect() {
+    let item = myScrollList.scrollElements[myScrollList.selected];
     timeSinceNewSong = millis() - time;
-    msPerBeat = 60 * 1000 / myScrollList.scrollElements[myScrollList.selected].bpm;
+    msPerBeat = 60 * 1000 / item.bpm;
     fill(0, 0, 100, flashAlpha / 4);
     rect(0, 0, w, h);
     flashAlpha -= 2;
@@ -831,6 +832,15 @@ function drawGame3SongSelect() {
     fill(0, 0, 100);
     rect(175 * scalarW, h * 0.93, w, h * 0.07);
 
+    // high score
+    fill(0, 0, 50);
+    textSize(25*scalarH);
+    textAlign(LEFT, CENTER);
+    text("best score: ", 185*scalarW, h-25*scalarH);
+    fill(340, 100, 100);
+    text(round(item.highScore), 330*scalarW, h-25*scalarH);
+
+    textAlign(CENTER);
     // start button
     fill('black');
     startGame3button.buttonWithText("START", 32, [170, 80, 100, 100]);
@@ -1030,7 +1040,8 @@ function initGame3() {
     timeSinceNewSong = 0;
     timeOfNextBeat = 0;
     startCountdown = 0;
-    started = false;
+    skip = 0;
+    ended = false;
     songOver = false;
     endCountdown = 0;
     item = myScrollList.scrollElements[myScrollList.selected];

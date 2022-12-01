@@ -46,7 +46,7 @@ function drawMenu() {
   
     game1Button.drawGameButton(mazeThumbnail, 0.2 * scalarH, "Maze");
     game2Button.drawGameButton(crosshairThumbnail, 0.2 * scalarH, "Duckhunt");
-    game3Button.drawGameButton(noteThumbnail, 0.2 * scalarH, "Game 3");
+    game3Button.drawGameButton(noteThumbnail, 0.2 * scalarH, "Piano");
   
     backButton.drawBack();
     if (backButton.clicked) {
