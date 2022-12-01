@@ -1,7 +1,8 @@
 function drawMenu() {
     startButton.buttonWithText("start", 60*scalarH);
     scoresButton.buttonWithText("view scores", 40*scalarH);
-    drawImage(title, width/2, (140*scalarH) - myPageChanger.transitionPercentExponential*5, 1+myPageChanger.transitionPercentExponential/50);
+    glow(color(0, 0, 100), 32);
+    drawImage(title, width/2, (140*scalarH) - myPageChanger.transitionPercentExponential*5, 1.5+myPageChanger.transitionPercentExponential/50);
     if (startButton.clicked) {
       myPageChanger.change(1); // go to game select screen
     }

@@ -55,7 +55,7 @@ function preload() {
     songFiles[0] = loadStrings('assets/songs/brain power.txt');
     songFiles[1] = loadStrings('assets/songs/meAndU.txt');
 
-    title = loadImage('assets/placeholder.png');
+    title = loadImage('assets/fmsarcade.png');
     heart = loadImage('assets/heart.png');
     playButton = loadImage('assets/playbutton.png');
 
